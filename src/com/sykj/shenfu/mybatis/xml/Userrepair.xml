@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IUserrepairDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">		
+	    <if test="repaircode != null and repaircode != ''">
+			<![CDATA[
+				and repaircode like concat('%',#{repaircode},'%')
+			]]>
+		</if>		
+		<if test="usercode != null and usercode != ''">
+			<![CDATA[
+				and usercode like concat('%',#{usercode},'%')
+			]]>
+		</if>
+		<if test="ordercode != null and ordercode != ''">
+			<![CDATA[
+				and ordercode like concat('%',#{ordercode},'%')
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Userrepair">
+		<![CDATA[
+   			insert into userrepair (repaircode,usercode,ordercode,productidentfy,repairercode,operatorcode,repairtime,addtime,content,dealdate,dealresult,status,remark) 
+   			               values(#{repaircode},#{usercode},#{ordercode},#{productidentfy},#{repairercode},#{operatorcode},#{repairtime},#{addtime},#{content},#{dealdate},#{dealresult},#{status},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Userrepair">
+		<![CDATA[
+			update userrepair set repaircode=#{repaircode},usercode=#{usercode},ordercode=#{ordercode},productidentfy=#{productidentfy},
+			                       repairercode=#{repairercode},operatorcode=#{operatorcode},repairtime=#{repairtime},content=#{content},dealdate=#{dealdate},
+			                       dealresult=#{dealresult},status=#{status},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Userrepair">
+		<![CDATA[
+			delete from userrepair
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Userrepair" resultType="Userrepair">
+		<![CDATA[
+			select * from userrepair
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Userrepair" resultType="Integer">
+		<![CDATA[
+			select count(1) from userrepair
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Userrepair" resultType="Userrepair">
+		<![CDATA[
+			select * from userrepair 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Userrepair" resultType="Userrepair">
+		<![CDATA[
+		 	select * from userrepair
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByRepaircode" parameterType="String" resultType="Userrepair">
+		<![CDATA[
+		 	select * from userrepair where repaircode = #{repaircode}
+		]]>
+	</select>
+</mapper>

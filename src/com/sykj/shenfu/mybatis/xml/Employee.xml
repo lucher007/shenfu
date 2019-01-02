@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IEmployeeDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">	
+	    <if test="1 == 1">
+			<![CDATA[
+				and employeecode <> '000000000001'
+			]]>
+		</if>			
+		<if test="employeename != null and employeename != ''">
+			<![CDATA[
+				and employeename like concat('%',#{employeename},'%')
+			]]>
+		</if>
+		<if test="address != null and address != ''">
+			<![CDATA[
+				and address like concat('%',#{address},'%')
+			]]>
+		</if>
+		<if test="phone != null and phone != ''">
+			<![CDATA[
+				and phone like concat('%',#{phone},'%')
+			]]>
+		</if>
+		<if test="employeesex != null and employeesex != ''">
+			<![CDATA[
+				and employeesex = #{employeesex}
+			]]>
+		</if>
+		<if test="status != null and status != ''">
+			<![CDATA[
+				and status = #{status}
+			]]>
+		</if>
+		<if test="department != null and department != ''">
+			<![CDATA[
+				and department = #{department}
+			]]>
+		</if>
+		<if test="employeecode != null and employeecode != ''">
+			<![CDATA[
+				and employeecode like concat('%',#{employeecode},'%')
+			]]>
+		</if>
+		<if test="parentemployeecode != null and parentemployeecode != ''">
+			<![CDATA[
+				and parentemployeecode like concat('%',#{parentemployeecode},'%')
+			]]>
+		</if>
+		<if test="employeetype != null and employeetype != ''">
+			<![CDATA[
+				and employeetype = #{employeetype}
+			]]>
+		</if>
+		<if test="rechargevipcode != null and rechargevipcode != ''">
+			<![CDATA[
+				and rechargevipcode = #{rechargevipcode}
+			]]>
+		</if>
+		<if test="extendcode != null and extendcode != ''">
+			<![CDATA[
+				and extendcode = #{extendcode}
+			]]>
+		</if>
+		<if test="managercode != null and managercode != ''">
+			<![CDATA[
+				and managercode = #{managercode}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Employee">
+		<![CDATA[
+   			insert into employee (employeename,employeesex,birthday,identification,email,address,
+   			                      phone,level,status,addtime,department,apppassword,employeetype,bankcardname,bankcardno,employeecode,parentemployeecode,rechargevipcode,extendcode,managercode,remark) 
+   			               values(#{employeename},#{employeesex},#{birthday},#{identification},#{email},#{address},
+   			                      #{phone},#{level},#{status},#{addtime},#{department},#{apppassword},#{employeetype},#{bankcardname},#{bankcardno},#{employeecode},#{parentemployeecode},#{rechargevipcode},#{extendcode},#{managercode},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Employee">
+		<![CDATA[
+			update employee set employeename=#{employeename},employeesex=#{employeesex},birthday=#{birthday},
+			                    identification=#{identification},email=#{email},address=#{address},
+			                    phone=#{phone},level=#{level},status=#{status},department=#{department},
+			                    apppassword=#{apppassword},employeetype=#{employeetype},bankcardname=#{bankcardname},
+			                    bankcardno=#{bankcardno},employeecode=#{employeecode},parentemployeecode=#{parentemployeecode},
+			                    rechargevipcode=#{rechargevipcode},extendcode=#{extendcode},managercode=#{managercode},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Employee">
+		<![CDATA[
+			delete from employee
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Employee" resultType="Employee">
+		<![CDATA[
+			select * from employee
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Employee" resultType="Integer">
+		<![CDATA[
+			select count(1) from employee
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Employee" resultType="Employee">
+		<![CDATA[
+			select * from employee 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Employee" resultType="Employee">
+		<![CDATA[
+		 	select * from employee
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByPhone" parameterType="Employee" resultType="Employee">
+		<![CDATA[
+		 	select * from employee where phone = #{phone}
+		]]>
+	</select>
+	
+	<select id="findByPhoneStr" parameterType="String" resultType="Employee">
+		<![CDATA[
+		 	select * from employee where phone = #{phone}
+		]]>
+	</select>
+	
+	<select id="findByEmployeecodeStr" parameterType="String" resultType="Employee">
+		<![CDATA[
+		 	select * from employee where employeecode = #{employeecode}
+		]]>
+	</select>
+	
+	
+	<update id="updateSalescore" parameterType="Employee">
+		<![CDATA[
+			update employee set salescore = #{salescore}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<update id="updateSalescoreByEmployeecode" parameterType="Employee">
+		<![CDATA[
+			update employee set salescore = salescore + #{salescore} where employeecode = #{employeecode}
+		]]>	
+	</update>
+	
+	<select id="findByExtendcode" parameterType="String" resultType="Employee">
+		<![CDATA[
+		 	select * from employee where extendcode = #{extendcode}
+		]]>
+	</select>
+	
+</mapper>

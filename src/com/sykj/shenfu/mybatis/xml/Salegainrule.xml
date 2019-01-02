@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ISalegainruleDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="gaincode != null and gaincode != ''">
+			<![CDATA[
+				and gaincode = #{gaincode}
+			]]>
+		</if>
+		<if test="gainname != null and gainname != ''">
+			<![CDATA[
+				and gainname like concat('%',#{gainname},'%')
+			]]>
+		</if>
+		<if test="gaintype != null and gaintype != ''">
+			<![CDATA[
+				and gaintype = #{gaintype}
+			]]>
+		</if>
+		<if test="status != null and status != ''">
+			<![CDATA[
+				and status = #{status}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Salegainrule">
+		<![CDATA[
+   			insert into salegainrule (gaincode,gainname,gainrate,gainform,gaintype,status,remark) 
+   			               values(#{gaincode},#{gainname},#{gainrate},#{gainform},#{gaintype},#{status},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Salegainrule">
+		<![CDATA[
+			update salegainrule set gaincode=#{gaincode},gainname=#{gainname},gainrate=#{gainrate},gainform=#{gainform},gaintype=#{gaintype},status=#{status},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Salegainrule">
+		<![CDATA[
+			delete from salegainrule
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Salegainrule" resultType="Salegainrule">
+		<![CDATA[
+			select * from salegainrule
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id asc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Salegainrule" resultType="Integer">
+		<![CDATA[
+			select count(1) from salegainrule
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Salegainrule" resultType="Salegainrule">
+		<![CDATA[
+			select * from salegainrule 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Salegainrule" resultType="Salegainrule">
+		<![CDATA[
+		 	select * from salegainrule
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByGaincode" parameterType="String" resultType="Salegainrule">
+		<![CDATA[
+		 	select * from salegainrule where gaincode = #{gaincode}
+		]]>
+	</select>
+	
+</mapper>

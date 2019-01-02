@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IUserpaylogDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="receivercode != null and receivercode != ''">
+			<![CDATA[
+				and receivercode like concat('%',#{receivercode},'%')
+			]]>
+		</if>
+		<if test="checkercode != null and checkercode != ''">
+			<![CDATA[
+				and checkercode like concat('%',#{checkercode},'%')
+			]]>
+		</if>
+		<if test="username != null and username != ''">
+			<![CDATA[
+				and username like concat('%',#{username},'%')
+			]]>
+		</if>
+		<if test="usercode != null and usercode != ''">
+			<![CDATA[
+				and usercode like concat('%',#{usercode},'%')
+			]]>
+		</if>
+		<if test="phone != null and phone != ''">
+			<![CDATA[
+				and phone like concat('%',#{phone},'%')
+			]]>
+		</if>
+		<if test="source != null and source != ''">
+			<![CDATA[
+				and source =#{source}
+			]]>
+		</if>
+		<if test="address != null and address != ''">
+			<![CDATA[
+				and address like concat('%',#{address},'%')
+			]]>
+		</if>
+		<if test="paytype != null and paytype != ''">
+			<![CDATA[
+				and paytype = #{paytype}
+			]]>
+		</if>
+		<if test="payitem != null and payitem != ''">
+			<![CDATA[
+				and payitem = #{payitem}
+			]]>
+		</if>
+		<if test="checkstatus != null and checkstatus != ''">
+			<![CDATA[
+				and checkstatus = #{checkstatus}
+			]]>
+		</if>
+		<if test="paysource != null and paysource != ''">
+			<![CDATA[
+				and paysource = #{paysource}
+			]]>
+		</if>
+		<if test="beginpaytime != null and beginpaytime != ''">
+			<![CDATA[
+				and date(paytime) >= date(#{beginpaytime})
+			]]>
+		</if>
+		<if test="endpaytime != null and endpaytime != ''">
+			<![CDATA[
+				and date(paytime) <= date(#{endpaytime})
+			]]>
+		</if>
+		<if test="beginchecktime != null and beginchecktime != ''">
+			<![CDATA[
+				and date(checktime) >= date(#{beginchecktime})
+			]]>
+		</if>
+		<if test="endchecktime != null and endchecktime != ''">
+			<![CDATA[
+				and date(checktime) <= date(#{endchecktime})
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Userpaylog">
+		<![CDATA[
+   			insert into userpaylog (usercode,username,phone,address,source,ordercode,paytype,payitem,paymoney,receivercode,paytime,checkercode,checktime,checkstatus,paysource,remark) 
+   			               values(#{usercode},#{username},#{phone},#{address},#{source},#{ordercode},#{paytype},#{payitem},#{paymoney},#{receivercode},#{paytime},#{checkercode},#{checktime},#{checkstatus},#{paysource},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Userpaylog">
+		<![CDATA[
+			update userpaylog set usercode=#{usercode},username=#{username},phone=#{phone},address=#{address},
+								source=#{source},ordercode=#{ordercode},paytype=#{paytype},payitem=#{payitem},
+								paymoney=#{paymoney},receivercode=#{receivercode},paytime=#{paytime},
+								checkercode=#{checkercode},checktime=#{checktime},checkstatus=#{checkstatus},paysource=#{paysource},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Userpaylog">
+		<![CDATA[
+			delete from userpaylog
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Userpaylog" resultType="Userpaylog">
+		<![CDATA[
+			select * from userpaylog
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Userpaylog" resultType="Integer">
+		<![CDATA[
+			select count(1) from userpaylog
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Userpaylog" resultType="Userpaylog">
+		<![CDATA[
+			select * from userpaylog 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Userpaylog" resultType="Userpaylog">
+		<![CDATA[
+		 	select * from userpaylog
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<insert id="saveBatch" parameterType="java.util.List">
+       <![CDATA[
+        INSERT IGNORE INTO userpaylog (usercode,username,phone,address,source,ordercode,paytype,payitem,paymoney,receivercode,paytime,checkercode,checktime,checkstatus,paysource,remark) 
+        VALUES
+        ]]>	
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+	            #{usercode},#{username},#{phone},#{address},#{source},#{ordercode},#{paytype},#{payitem},#{paymoney},#{receivercode},#{paytime},#{checkercode},#{checktime},#{checkstatus},#{paysource},#{remark}
+            )
+        </foreach>
+    </insert>
+	
+	<!-- 财务到账统计 -->
+	<select id="userpayarrivalStat" parameterType="Userpaylog" resultType="Userpaylog">
+  		<![CDATA[
+			SELECT         paytype, 
+				       sum(paymoney) as totalmoney,
+				     count(paytype) as totalcount 
+			    FROM userpaylog
+			   where checkstatus = '1'
+		]]>
+		<if test="beginchecktime != null and beginchecktime != ''">
+	  		<![CDATA[
+				and date(checktime) >= #{beginchecktime}
+	        ]]>	  
+        </if>
+        <if test="endchecktime != null and endchecktime != ''">
+	  		<![CDATA[
+				and date(checktime) <= #{endchecktime}
+	        ]]>	  
+        </if>
+        <if test="paytype != null and paytype != ''">
+	  		<![CDATA[
+				and paytype = #{paytype}
+	        ]]>	  
+        </if>
+        <if test="paysource != null and paysource != ''">
+	  		<![CDATA[
+				and paysource = #{paysource}
+	        ]]>	  
+        </if>
+		<![CDATA[
+			GROUP BY paytype
+		]]>
+		<![CDATA[
+		 	order by totalmoney desc
+		]]>	
+    </select>
+	
+</mapper>

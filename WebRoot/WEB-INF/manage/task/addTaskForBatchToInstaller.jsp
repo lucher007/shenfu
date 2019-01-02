@@ -1,0 +1,294 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8" isELIgnored="false"%>
+<%@ taglib uri="http://jsptags.com/tags/navigation/pager" prefix="pg" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+
+<!doctype html>
+<html>
+<head>
+<base href="<%=basePath%>" />
+<meta charset="utf-8">
+<title></title>
+<link type="text/css" rel="stylesheet" href="style/user.css">
+<link rel="stylesheet" type="text/css" href="style/easyui/easyui.css">
+<link rel="stylesheet" type="text/css" href="main/plugin/easyui/themes/icon.css">
+<style type="text/css">
+	#body table tr {
+      height: 30px;
+    }
+</style>
+
+</head>
+
+<body>
+	<div id="body">
+	<form action="" method="post" id="addForm" name="addForm">
+   		<div class="seh-box">
+        	<input type="hidden" id="jumpurl" name = "jumpurl" value="batchAddToInstaller">
+            <table width="100%">
+		    	<tr>
+		    		<td align="right" width="10%">客户姓名：</td>
+		    		<td width="20%">
+		    			<input type="text"  class="inp w200" name="username" id="username" value="">
+		    		</td>
+		    		<td align="right" width="15%">电话号码：</td>
+		    		<td width="20%">
+		    			<input type="text"  class="inp w200" name="phone" id="phone" value="">
+		    		</td>
+		    		<td align="right" width="15%">来源：</td>
+		    		<td width="20%">
+		    			<select id="source" name="source" class="select" onchange="queryUser();">
+		    				<option value=""  >请选择</option>
+							<option value="0" >销售</option>
+							<option value="1" >400客服</option>
+						</select>
+		    		</td>
+		    		<td align="right" width="130">
+        				<a href="javascript:queryUser();" class="easyui-linkbutton" iconCls="icon-search" style="width:80px">查询</a>
+   		    		</td>
+		    	</tr>
+		    	<tr>
+		    		<td align="right" width="10%">安装地址：</td>
+		    		<td width="20%">
+		    			<input type="text"  class="inp w200" name="address" id="address" value="">
+		    		</td>
+		    		<td align="right">是否需要派测量单：</td>
+        			<td >
+        				<select id="visitorflag" name="visitorflag" class="select" onchange="queryUser();">
+			                 <option value="1" >需要</option>
+			                 <option value="0" >不需要</option>
+			            </select>
+        			</td>
+		    		<td align="right">是否已派测量单：</td>
+        			<td >
+        				<select id="visitorstatus" name="visitorstatus" class="select" onchange="queryUser();">
+			                  <!-- 
+			                   <option value=""  <c:if test="${usertask.status == ''}">selected</c:if>>请选择</option>
+			                    -->
+			                   <option value="0" <c:if test="${userorder.visitorstatus == '0' }">selected</c:if>>未派单</option>
+			                   <!--
+			                   <option value="1" <c:if test="${usertask.status == '1' }">selected</c:if>>已派销售单</option>
+			                   <option value="2" <c:if test="${usertask.status == '2' }">selected</c:if>>已派任务单</option>
+			             	  -->
+			             </select>
+        			</td>
+		    	</tr>
+   		    </table>
+    </div>
+    <div id = "userDG" style="width:100%; height: 400px"></div>
+    <div id="tools">
+		<div style="margin-bottom:5px">
+			上门人员姓名：
+			<input type="hidden" class="inp w200" name="visitorcode" id="visitorcode" readonly="readonly" style="background:#eeeeee;" value="">
+			<input type="text" class="inp w200" name="visitorname" id="visitorname" readonly="readonly" style="background:#eeeeee;" value="">
+			<a href="javascript:chooseEmployee();" class="easyui-linkbutton" iconCls="icon-search" style="width:80px">请选择</a>
+			<a href="javascript:cleanEmployee();" class="easyui-linkbutton" iconCls="icon-undo" style="width:80px">清除</a>
+			上门时间：
+			<input type="text" id="visittime" name="visittime"
+                   onclick="WdatePicker({lang:'${locale}',skin:'blueFresh',isShowWeek:true,isShowClear:true,dateFmt:'yyyy-MM-dd HH:mm:ss'});" class="Wdate inp w150">
+			<a href="javascript:saveTask('add');" class="easyui-linkbutton" iconCls="icon-ok"  plain="true">派任务单</a>
+		</div>
+	</div>
+	<div class="form-box">
+		<div class="fb-bom">
+			<cite>
+				<a href="javascript:goback();" class="easyui-linkbutton" iconCls="icon-back" style="width:80px">返回</a>
+			</cite> 
+			<span class="red">${usertask.returninfo}</span>
+		</div>
+	</div>
+</form>
+</div>    
+<script type="text/javascript" src="js/common/jquery.js"></script>
+<script type="text/javascript" src="<%=basePath%>js/My97DatePicker/WdatePicker.js" defer="defer"></script>
+<script type="text/javascript" src="js/plugin/lhgdialog/lhgdialog.js?self=true&skin=iblue"></script>
+<script type="text/javascript" src="js/common/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="main/plugin/easyui/js/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="js/form.js"></script>
+<script type="text/javascript">
+	
+	function initUserDatagrid(){
+         $('#userDG').datagrid({
+              title: '未派任务单订单信息',
+              queryParams: paramsJson(),
+              url:'userorder/findListJson',
+              pagination: true,
+              singleSelect: false,
+              scrollbar:true,
+              pageSize: 10,
+              pageList: [10,30,50], 
+              //fitColumns:true,
+              idField:'id',   //idField 属性已设置，数据网格（DataGrid）的选择集合将在不同的页面保持。
+              loadMsg:'正在加载数据......',
+              toolbar:'#tools',
+              frozenColumns:[[
+                            { field: 'id', title: '全选',checkbox:true,align:"center",width:100 },
+                            { field: 'ordercode', title: '订单编号',width:150,align:"center"},
+      	                    { field: 'usercode', title: '客户编号',width:150,align:"center"},
+      	                    { field: 'username', title: '客户姓名',width:150,align:"center"},
+      	                    { field: 'phone', title: '联系电话',width:100,align:"center"},       
+                       ]],
+                    columns: [[
+      	                    { field: 'visittypename', title: '讲解类型',width:200,align:"center"},
+      	                    { field: 'talkername', title: '讲解人员',width:200,align:"center"},
+      		                { field: 'sourcename', title: '客户来源',width:150,align:"center"},
+      		                { field: 'salercode', title: '销售员编号',width:150,align:"center"},
+      		                { field: 'salername', title: '销售员姓名',width:150,align:"center"},
+      		                { field: 'firstpayment', title: '首付金额',width:150,align:"center",},
+						    { field: 'firstarrivalflagname', title: '首付金额标识',width:150,align:"center",},
+						    { field: 'finalpayment', title: '尾款金额',width:150,align:"center",},
+						    { field: 'finalarrivalflagname', title: '尾款金额标识',width:150,align:"center",},
+						    { field: 'productfee', title: '产品费用',width:150,align:"center",},
+      		                { field: 'statusname', title: '状态',width:150,align:"center"},
+      		                { field: 'addtime', title: '添加时间',width:150,align:"center"},
+      		                { field: 'address', title: '安装地址',width:300,align:"center",
+                        			formatter: function (value) {
+	      					        	return "<span title='" + value + "'>" + value + "</span>";
+	      					        },
+                          	},
+                    	]]
+          });
+	}
+	
+	//将表单数据转为json
+	 function paramsJson(){
+	 	var json = {
+	 			username:$("#username").val(),
+		 		phone:$("#phone").val(),
+		 		source:$("#source").val(),
+		 		address:$("#address").val(),
+		 		status:$("#status").val(),
+		 		visitorflag:$("#visitorflag").val(),
+		 		visitorstatus:$("#visitorstatus").val(),
+	 	};
+	 	return json;
+	 }
+	
+	function queryUser() {
+		$('#userDG').datagrid('reload',paramsJson());
+		$('#userDG').datagrid('clearChecked');//清空选中的值
+	}
+	
+	function selectUser(index){
+	    //先选中该行
+	 	$("#userDG").datagrid('selectRow',index);
+	 	
+	 	//获取选中的行
+	 	var row = $("#userDG").datagrid('getSelected');
+	 	
+	 	//将row转换成json字符串
+	 	var event = JSON.stringify(row);
+	 	//中文进行编码转换，防止乱码
+		var o = JSON.parse(event); 
+		//将Json字符串赋值给event
+		eval("var event = '"+JSON.stringify(o)+"';"); 
+		
+		parent.closeUserDialog(event);
+     }
+	
+	$(function () {
+	   
+	   //初始化潜在客户列表
+	   initUserDatagrid();
+		
+       var returninfo = '${usertask.returninfo}';
+       if (returninfo != '') {
+        	$.dialog.tips(returninfo, 1, 'alert.gif');
+       }
+    });
+    
+	
+	var employeeDialog;
+	function chooseEmployee() {
+		employeeDialog = $.dialog({
+			title : '员工信息',
+			lock : true,
+			width : 1000,
+			height : 600,
+			top : 0,
+			drag : false,
+			resize : false,
+			max : false,
+			min : false,
+			content : 'url:employee/findEmployeeListDialog?rid='+Math.random()
+		});
+	}
+
+	function closeEmployeeDialog(jsonStr) {
+		employeeDialog.close();
+		//将json字符串转换成json对象
+	    var jsonObject =  eval("(" + jsonStr +")");
+	    
+	    $("#visitorcode").val(jsonObject.employeecode);
+		$("#visitorname").val(jsonObject.employeename);
+	}
+	
+	function cleanEmployee() {
+		  $('#visitorcode').val("");
+		  $('#visitorname').val("");
+	}
+	
+	function goback(){
+		parent.closeDialog();
+	}
+	
+	
+	function saveTask() {
+		
+		 //获取所有选择的产品
+	     var rowsSelected = $("#userDG").datagrid("getChecked");
+		 
+	     if(rowsSelected == null  || rowsSelected == ''){
+        	 $.dialog.tips('请选择某一条记录', 2, 'alert.gif');
+		     return;
+        }
+		
+		if ($("#visitorcode") != undefined && ($("#visitorcode").val() == "" || $("#visitorcode").val() == null )) {
+			$.dialog.tips("请选择上门人员", 1, "alert.gif", function() {
+				$("#visitorname").focus();
+			});
+			return false;
+		}
+		
+		 //获取选择的对象
+	    var ordercodearr = [];
+	    for(var i=0; i<rowsSelected.length; i++){
+	    	ordercodearr.push(rowsSelected[i].ordercode);
+	    }
+	    var ordercodes = ordercodearr.join(',');
+		
+	    $.dialog({
+		    title: '提交',
+		    lock: true,
+		    background: '#000', /* 背景色 */
+		    opacity: 0.5,       /* 透明度 */
+		    content: '是否确定执行？',
+		    icon: 'alert.gif',
+		    ok: function () {
+		    	$("#addForm").attr("action", "task/saveTaskForBatchToInstaller?ordercodes="+ordercodes+"&rid="+Math.random());
+				$("#addForm").submit();
+		        /* 这里要注意多层锁屏一定要加parent参数 */
+		        $.dialog({
+		        	lock: true,
+		            title: '提示',
+		        	content: '执行中，请等待......', 
+		        	max: false,
+				    min: false,
+				    cancel:false,
+		        	icon: 'loading.gif',
+		        });
+		        return false;
+		    },
+		    okVal: '确定',
+		    cancel: true,
+		    cancelVal:'取消'
+		});
+	}
+</script>
+</body>
+</html>

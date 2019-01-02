@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IUsertaskDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="username != null and username != ''">
+			<![CDATA[
+				and username like concat('%',#{username},'%')
+			]]>
+		</if>
+		<if test="phone != null and phone != ''">
+			<![CDATA[
+				and phone like concat('%',#{phone},'%')
+			]]>
+		</if>		
+		<if test="taskcode != null and taskcode != ''">
+			<![CDATA[
+				and taskcode like concat('%',#{taskcode},'%')
+			]]>
+		</if>
+		<if test="address != null and address != ''">
+			<![CDATA[
+				and address like concat('%',#{address},'%')
+			]]>
+		</if>
+		<if test="status != null and status != ''">
+			<![CDATA[
+				and status=#{status}
+			]]>
+		</if>
+		<if test="source != null and source != ''">
+			<![CDATA[
+				and source=#{source}
+			]]>
+		</if>
+		<if test="ordercode != null and ordercode != ''">
+			<![CDATA[
+				and ordercode=#{ordercode}
+			]]>
+		</if>
+		<if test="usercode != null and usercode != ''">
+			<![CDATA[
+				and usercode like concat('%',#{usercode},'%')
+			]]>
+		</if>
+		<if test="visitorcode != null and visitorcode != ''">
+			<![CDATA[
+				and visitorcode like concat('%',#{visitorcode},'%')
+			]]>
+		</if>
+		<if test="visittype != null and visittype != ''">
+			<![CDATA[
+				and visittype = #{visittype}
+			]]>
+		</if>
+		<if test="salercode != null and salercode != ''">
+			<![CDATA[
+				and salercode like concat('%',#{salercode},'%')
+			]]>
+		</if>
+		<if test="talkercode != null and talkercode != ''">
+			<![CDATA[
+				and talkercode like concat('%',#{talkercode},'%')
+			]]>
+		</if>
+		<if test="id != null and id != ''">
+			<![CDATA[
+				and id=#{id}
+			]]>
+		</if>
+		<if test="tasktype != null and tasktype != ''">
+			<![CDATA[
+				and tasktype = #{tasktype}
+			]]>
+		</if>
+		<if test='querystateflag == "0" '>
+			<![CDATA[
+				and status = '0'
+			]]>
+		</if>
+		<if test='querystateflag == "1" '>
+			<![CDATA[
+				and status in ('1','10')
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Usertask">
+		<![CDATA[
+   			insert into usertask (taskcode,ordercode,usercode,username,usersex,phone,address,source,visittype,salercode,talkercode,visitorcode,operatorcode,visitstate,visittime,intention,status,addtime,dealdate,dealresult,tasktype,remark) 
+   			               values(#{taskcode},#{ordercode},#{usercode},#{username},#{usersex},#{phone},#{address},#{source},#{visittype},#{salercode},#{talkercode},#{visitorcode},#{operatorcode},#{visitstate},#{visittime},#{intention},#{status},#{addtime},#{dealdate},#{dealresult},#{tasktype},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Usertask">
+		<![CDATA[
+			update usertask set ordercode=#{ordercode},usercode=#{usercode},username=#{username},usersex=#{usersex},phone=#{phone},address=#{address},source=#{source},visittype=#{visittype},salercode=#{salercode},
+							    talkercode=#{talkercode},visitorcode=#{visitorcode},operatorcode=#{operatorcode},visitstate=#{visitstate},visittime=#{visittime},intention=#{intention},status=#{status},dealdate=#{dealdate},dealresult=#{dealresult},tasktype=#{tasktype},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Usertask">
+		<![CDATA[
+			delete from usertask
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Usertask" resultType="Usertask">
+		<![CDATA[
+			select * from usertask
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Usertask" resultType="Integer">
+		<![CDATA[
+			select count(1) from usertask
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Usertask" resultType="Usertask">
+		<![CDATA[
+			select * from usertask 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Usertask" resultType="Usertask">
+		<![CDATA[
+		 	select * from usertask
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByTaskcodeStr" parameterType="String" resultType="Usertask">
+		<![CDATA[
+		 	select * from usertask where taskcode = #{taskcode}
+		]]>
+	</select>
+	
+	<delete id="deleteByOrdercode" parameterType="String">
+		<![CDATA[
+			delete from usertask where ordercode = #{ordercode}
+		]]>		
+	</delete>
+	
+</mapper>

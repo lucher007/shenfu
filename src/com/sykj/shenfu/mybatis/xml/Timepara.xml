@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ITimeparaDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="level != null and level != ''">
+			<![CDATA[
+				and level=#{level}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Timepara">
+		<![CDATA[
+   			insert into timepara (level,time,remark) 
+   			               values(#{level},#{time},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Timepara">
+		<![CDATA[
+			update timepara set level=#{level},time=#{time},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Timepara">
+		<![CDATA[
+			delete from timepara
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Timepara" resultType="Timepara">
+		<![CDATA[
+			select * from timepara
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id asc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Timepara" resultType="Integer">
+		<![CDATA[
+			select count(1) from timepara
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Timepara" resultType="Timepara">
+		<![CDATA[
+			select * from timepara 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Timepara" resultType="Timepara">
+		<![CDATA[
+		 	select * from timepara
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+</mapper>

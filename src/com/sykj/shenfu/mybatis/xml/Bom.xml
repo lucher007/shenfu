@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IBomDao">
+	<sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	<sql id="whereColumns">	
+		<if test="productcode != null and productcode != ''">
+			<![CDATA[
+				and productcode = #{productcode}
+			]]>
+		</if>
+	</sql>
+	
+	<select id="findByList" parameterType="Bom" resultType="Bom">
+		<![CDATA[
+			select * from bom 	
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+		  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by materialcode asc limit #{pager_offset},#{pager_openset}
+		]]>		
+	</select>
+
+	<select id="findRootBom" parameterType="Bom" resultType="Bom">
+		<![CDATA[
+			select * from bom where pid is null order by bomcode asc limit #{pager_offset},#{pager_openset}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Bom" resultType="Integer">
+		<![CDATA[
+			select count(1) from bom 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+		  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Bom" resultType="Bom">
+		<![CDATA[
+			select * from bom 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+		  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by materialcode asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Integer"  resultType="Bom" >
+		<![CDATA[
+		 	select * from bom
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<insert id="save" parameterType="Bom">
+		<![CDATA[
+			insert into bom (pid,productcode,productname,bomcode,materialcode,materialname,amount,remark)
+			   values (#{pid},#{productcode},#{productname},#{bomcode},#{materialcode},#{materialname},#{amount},#{remark})				
+		]]>	
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+	
+	<update id="update" parameterType="Bom">
+		<![CDATA[
+			update bom set pid=#{pid},productcode=#{productcode},productname=#{productname},bomcode=#{bomcode},
+						   materialcode=#{materialcode},materialname=#{materialname},amount=#{amount},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Integer">
+		<![CDATA[
+			delete from bom where id=#{id}
+		]]>		
+	</delete>
+	
+	<select id="findByProductcodeAndMaterialcode" resultType="Bom">
+		<![CDATA[
+		 	select * from bom where productcode = #{productcode} and materialcode = #{materialcode} 
+		]]>
+	</select>
+	
+	<select id="queryListByPid" parameterType="Bom" resultType="Bom" >
+		<![CDATA[
+			select * from bom 
+		]]>
+		<where>
+			<if test="productcode != null and productcode != ''">
+				<![CDATA[
+					and productcode = #{productcode}
+				]]>
+			</if>
+			<if test="pid != null and pid != ''">
+				<![CDATA[
+					and pid = #{pid}
+				]]>
+			</if>
+			<if test="pid == null or pid == ''">
+				<![CDATA[
+					and pid is null
+				]]>
+			</if>
+		</where>
+	    <![CDATA[
+	      order by bomcode asc
+	    ]]>
+	</select> 
+	
+	<delete id="deleteBatchByBomcode" parameterType="Bom">
+		<![CDATA[
+			delete from bom where productcode=#{productcode} and (bomcode= #{bomcode} or bomcode like concat(#{bomcode},'\_%'))
+		]]>		
+	</delete>
+	
+</mapper>

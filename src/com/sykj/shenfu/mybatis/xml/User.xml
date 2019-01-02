@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IUserDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="username != null and username != ''">
+			<![CDATA[
+				and username like concat('%',#{username},'%')
+			]]>
+		</if>
+		<if test="usercode != null and usercode != ''">
+			<![CDATA[
+				and usercode like concat('%',#{usercode},'%')
+			]]>
+		</if>
+		<if test="phone != null and phone != ''">
+			<![CDATA[
+				and phone like concat('%',#{phone},'%')
+			]]>
+		</if>
+		<if test="source != null and source != ''">
+			<![CDATA[
+				and source =#{source}
+			]]>
+		</if>
+		<if test="address != null and address != ''">
+			<![CDATA[
+				and address like concat('%',#{address},'%')
+			]]>
+		</if>
+		<if test="status != null and status != '' and status != '0,1' ">
+			<![CDATA[
+				and status =#{status}
+			]]>
+		</if>
+		<if test="status == '0,1' ">
+			<![CDATA[
+				and status in ('0','1')
+			]]>
+		</if>
+		<if test="salercode != null and salercode != ''">
+			<![CDATA[
+				and salercode like concat('%',#{salercode},'%')
+			]]>
+		</if>
+		<if test="visittype != null and visittype != ''">
+			<![CDATA[
+				and visittype = #{visittype}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="User">
+		<![CDATA[
+   			insert into user (usercode,username,usersex,phone,address,source,addtime,status,visittype,checkstatus,checktime,salercode,dealresult,needtalker,lockcoreflag,productcolor,remark) 
+   			               values(#{usercode},#{username},#{usersex},#{phone},#{address},#{source},#{addtime},#{status},#{visittype},#{checkstatus},#{checktime},#{salercode},#{dealresult},#{needtalker},#{lockcoreflag},#{productcolor},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="User">
+		<![CDATA[
+			update user set usercode=#{usercode},username=#{username},usersex=#{usersex},phone=#{phone},
+								address=#{address},source=#{source},status=#{status},
+								visittype=#{visittype},checkstatus=#{checkstatus},checktime=#{checktime},salercode=#{salercode},dealresult=#{dealresult},needtalker=#{needtalker},lockcoreflag=#{lockcoreflag},productcolor=#{productcolor},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="User">
+		<![CDATA[
+			delete from user
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="User" resultType="User">
+		<![CDATA[
+			select * from user
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="User" resultType="Integer">
+		<![CDATA[
+			select count(1) from user
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="User" resultType="User">
+		<![CDATA[
+			select * from user 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="User" resultType="User">
+		<![CDATA[
+		 	select * from user
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByPhone" parameterType="User" resultType="User">
+		<![CDATA[
+		 	select * from user where phone = #{phone}
+		]]>
+	</select>
+	
+	<select id="findByPhoneStr" parameterType="String" resultType="User">
+		<![CDATA[
+		 	select * from user where phone = #{phone}
+		]]>
+	</select>
+	
+	<select id="findByUsercodeStr" parameterType="String" resultType="User">
+		<![CDATA[
+		 	select * from user where usercode = #{usercode}
+		]]>
+	</select>
+	
+</mapper>

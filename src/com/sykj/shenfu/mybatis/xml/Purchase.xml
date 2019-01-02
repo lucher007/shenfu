@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IPurchaseDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="purchasecode != null and purchasecode != ''">
+			<![CDATA[
+				and purchasecode like concat('%',#{purchasecode},'%')
+			]]>
+		</if>
+		<if test="suppliername != null and suppliername != ''">
+			<![CDATA[
+				and suppliername like concat('%',#{suppliername},'%')
+			]]>
+		</if>
+		<if test="status != null and status != ''">
+			<![CDATA[
+				and status = #{status}
+			]]>
+		</if>
+		<if test="billtype != null and billtype != ''">
+			<![CDATA[
+				and billtype = #{billtype}
+			]]>
+		</if>
+		<if test="billstatus != null and billstatus != ''">
+			<![CDATA[
+				and billstatus = #{billstatus}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Purchase">
+		<![CDATA[
+   			insert into purchase (purchasecode,supplierid,suppliername,supplierinfo,materailmoney,deliverymoney,discountmoney,totalmoney,plandelivertime,planarrivaltime,actualdelivertime,actualarrivaltime,status,operatorcode,addtime,billtype,billstatus,invoicecode,remark) 
+   			               values(#{purchasecode},#{supplierid},#{suppliername},#{supplierinfo},#{materailmoney},#{deliverymoney},#{discountmoney},#{totalmoney},#{plandelivertime},#{planarrivaltime},#{actualdelivertime},#{actualarrivaltime},#{status},#{operatorcode},#{addtime},#{billtype},#{billstatus},#{invoicecode},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Purchase">
+		<![CDATA[
+			update purchase set purchasecode=#{purchasecode},supplierid=#{supplierid},suppliername=#{suppliername},supplierinfo=#{supplierinfo},materailmoney=#{materailmoney},deliverymoney=#{deliverymoney},discountmoney=#{discountmoney},totalmoney=#{totalmoney},
+								plandelivertime=#{plandelivertime},planarrivaltime=#{planarrivaltime},actualdelivertime=#{actualdelivertime},actualarrivaltime=#{actualarrivaltime},status=#{status},operatorcode=#{operatorcode},billtype=#{billtype},billstatus=#{billstatus},invoicecode=#{invoicecode},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Purchase">
+		<![CDATA[
+			delete from purchase
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Purchase" resultType="Purchase">
+		<![CDATA[
+			select * from purchase
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			 order by id desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Purchase" resultType="Integer">
+		<![CDATA[
+			select count(1) from purchase
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Purchase" resultType="Purchase">
+		<![CDATA[
+			select * from purchase 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Purchase" resultType="Purchase">
+		<![CDATA[
+		 	select * from purchase
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findMaxPurchasecode" resultType="String">
+		<![CDATA[
+		 	select max(purchasecode) from purchase 
+		]]>
+	</select>
+	
+</mapper>

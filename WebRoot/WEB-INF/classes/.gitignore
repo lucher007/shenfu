@@ -1,0 +1,10 @@
+/applicationContext-web.xml
+/applicationContext.xml
+/com
+/jdbc.properties
+/log4j.properties
+/messages_en_US.properties
+/messages_zh_CN.properties
+/myBatisConfig.xml
+/system.properties
+/test

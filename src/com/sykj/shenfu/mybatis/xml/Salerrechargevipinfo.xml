@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ISalerrechargevipinfoDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="employeecode != null and employeecode != ''">
+			<![CDATA[
+				and employeecode=#{employeecode}
+			]]>
+		</if>
+		<if test="phone != null and phone != ''">
+			<![CDATA[
+				and phone=#{phone}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Salerrechargevipinfo">
+		<![CDATA[
+   			insert into salerrechargevipinfo (employeecode,phone,gainmonth,gaintimes,remark) 
+   			               values(#{employeecode},#{phone},#{gainmonth},#{gaintimes},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Salerrechargevipinfo">
+		<![CDATA[
+			update salerrechargevipinfo set employeecode=#{employeecode},phone=#{phone},gainmonth=#{gainmonth},gaintimes=#{gaintimes},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Salerrechargevipinfo">
+		<![CDATA[
+			delete from salerrechargevipinfo
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Salerrechargevipinfo" resultType="Salerrechargevipinfo">
+		<![CDATA[
+			select * from salerrechargevipinfo
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id asc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Salerrechargevipinfo" resultType="Integer">
+		<![CDATA[
+			select count(1) from salerrechargevipinfo
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Salerrechargevipinfo" resultType="Salerrechargevipinfo">
+		<![CDATA[
+			select * from salerrechargevipinfo 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Salerrechargevipinfo" resultType="Salerrechargevipinfo">
+		<![CDATA[
+		 	select * from salerrechargevipinfo
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByEmployeecode" parameterType="String" resultType="Salerrechargevipinfo">
+		<![CDATA[
+		 	select * from salerrechargevipinfo where employeecode = #{employeecode}
+		]]>
+	</select>
+	
+	<select id="findByPhone" parameterType="String" resultType="Salerrechargevipinfo">
+		<![CDATA[
+		 	select * from salerrechargevipinfo where phone = #{phone}
+		]]>
+	</select>
+	
+</mapper>

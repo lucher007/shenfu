@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IOperatorlogDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="begintime != null and begintime != ''">
+			<![CDATA[
+				and date(addtime) >= date(#{begintime})
+			]]>
+		</if>
+		<if test="endtime != null and endtime != ''">
+			<![CDATA[
+				and date(addtime) <= date(#{endtime})
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Operatorlog">
+		<![CDATA[
+   			insert into operatorlog (operatorcode,content,addtime,remark) 
+   			               values(#{operatorcode},#{content},#{addtime},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Operatorlog">
+		<![CDATA[
+			update operatorlog set operatorcode=#{operatorcode},content=#{content},addtime=#{addtime},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Operatorlog">
+		<![CDATA[
+			delete from operatorlog
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Operatorlog" resultType="Operatorlog">
+		<![CDATA[
+			select * from operatorlog
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Operatorlog" resultType="Integer">
+		<![CDATA[
+			select count(1) from operatorlog
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Operatorlog" resultType="Operatorlog">
+		<![CDATA[
+			select * from operatorlog 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Operatorlog" resultType="Operatorlog">
+		<![CDATA[
+		 	select * from operatorlog
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+</mapper>

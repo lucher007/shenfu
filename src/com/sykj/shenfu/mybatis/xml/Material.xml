@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IMaterialDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="materialcode != null and materialcode != ''">
+			<![CDATA[
+				and materialcode like concat('%',#{materialcode},'%')
+			]]>
+		</if>
+		<if test="materialname != null and materialname != ''">
+			<![CDATA[
+				and materialname like concat('%',#{materialname},'%')
+			]]>
+		</if>
+		<if test="materialstatus != null and materialstatus != ''">
+			<![CDATA[
+				and materialstatus = #{materialstatus}
+			]]>
+		</if>
+		<if test="materialsource != null and materialsource != ''">
+			<![CDATA[
+				and materialsource = #{materialsource}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Material">
+		<![CDATA[
+   			insert into material (materialcode,materialname,materialunit,depotamount,materialstatus,materialsource,remark) 
+   			               values(#{materialcode},#{materialname},#{materialunit},#{depotamount},#{materialstatus},#{materialsource},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Material">
+		<![CDATA[
+			update material set materialcode=#{materialcode},materialname=#{materialname},materialunit=#{materialunit},
+								materialstatus=#{materialstatus},depotamount=#{depotamount},materialsource=#{materialsource},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<update id="updateDepotamount" parameterType="Material">
+		<![CDATA[
+			update material set depotamount=#{depotamount}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Material">
+		<![CDATA[
+			delete from material
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Material" resultType="Material">
+		<![CDATA[
+			select * from material
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Material" resultType="Integer">
+		<![CDATA[
+			select count(1) from material
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Material" resultType="Material">
+		<![CDATA[
+			select * from material 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	
+	<select id="findById" parameterType="Material" resultType="Material">
+		<![CDATA[
+		 	select * from material
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByMaterialcodeStr" parameterType="String" resultType="Material">
+		<![CDATA[
+		 	select * from material where materialcode = #{materialcode}
+		]]>
+	</select>
+	
+	<select id="findByMaterialname" parameterType="String" resultType="Material">
+		<![CDATA[
+		 	select * from material where materialname = #{materialname}
+		]]>
+	</select>
+	
+	
+</mapper>

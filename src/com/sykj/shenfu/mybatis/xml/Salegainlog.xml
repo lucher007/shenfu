@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ISalegainlogDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">	
+		<if test="gainercode != null and gainercode != ''">
+			<![CDATA[
+				and gainercode=#{gainercode}
+			]]>
+		</if>			
+		<if test="gainlogcode != null and gainlogcode != ''">
+			<![CDATA[
+				and gainlogcode=#{gainlogcode}
+			]]>
+		</if>
+		<if test="status != null and status != ''">
+			<![CDATA[
+				and status=#{status}
+			]]>
+		</if>
+		<if test="begintime != null and begintime != ''">
+			<![CDATA[
+				and date(gaintime) >= date(#{begintime})
+			]]>
+		</if>
+		<if test="endtime != null and endtime != ''">
+			<![CDATA[
+				and date(gaintime) <= date(#{endtime})
+			]]>
+		</if>
+		<if test="gaincontentflag != null and gaincontentflag != ''">
+			<![CDATA[
+				and (gaincontent is not null or gaincontent != '')
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Salegainlog">
+		<![CDATA[
+   			insert into salegainlog (gainlogcode,gainercode,gainmoney,gaintime,operatorcode,gaintype,status,gaincontent,remark) 
+   			               values(#{gainlogcode},#{gainercode},#{gainmoney},#{gaintime},#{operatorcode},#{gaintype},#{status},#{gaincontent},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Salegainlog">
+		<![CDATA[
+			update salegainlog set gainlogcode=#{gainlogcode},gainercode=#{gainercode},gainmoney=#{gainmoney},
+					                gaintime=#{gaintime},operatorcode=#{operatorcode},gaintype=#{gaintype},status=#{status},gaincontent=#{gaincontent},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Salegainlog">
+		<![CDATA[
+			delete from salegainlog
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Salegainlog" resultType="Salegainlog">
+		<![CDATA[
+			select * from salegainlog
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by gainlogcode desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Salegainlog" resultType="Integer">
+		<![CDATA[
+			select count(1) from salegainlog
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Salegainlog" resultType="Salegainlog">
+		<![CDATA[
+			select * from salegainlog 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by gainlogcode desc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Integer" resultType="Salegainlog">
+		<![CDATA[
+		 	select * from salegainlog
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<update id="updateStatus" parameterType="Salegainlog">
+		<![CDATA[
+			update salegainlog set status=#{status}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="deleteByOrdercode" parameterType="String">
+		<![CDATA[
+			delete from salegainlog where ordercode = #{ordercode}
+		]]>		
+	</delete>
+	
+</mapper>

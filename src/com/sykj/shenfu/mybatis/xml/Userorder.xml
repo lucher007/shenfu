@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IUserorderDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">	
+		<if test="usercode != null and usercode != ''">
+			<![CDATA[
+				and usercode like concat('%',#{usercode},'%')
+			]]>
+		</if>
+		<if test="username != null and username != ''">
+			<![CDATA[
+				and username like concat('%',#{username},'%')
+			]]>
+		</if>
+		<if test="phone != null and phone != ''">
+			<![CDATA[
+				and phone like concat('%',#{phone},'%')
+			]]>
+		</if>	
+		<if test="address != null and address != ''">
+			<![CDATA[
+				and address like concat('%',#{address},'%')
+			]]>
+		</if>
+		<if test="source != null and source != ''">
+			<![CDATA[
+				and source=#{source}
+			]]>
+		</if>
+		<if test="visittype != null and visittype != ''">
+			<![CDATA[
+				and visittype=#{visittype}
+			]]>
+		</if>				
+		<if test="ordercode != null and ordercode != ''">
+			<![CDATA[
+				and ordercode like concat('%',#{ordercode},'%')
+			]]>
+		</if>
+		<if test="id != null and id != ''">
+			<![CDATA[
+				and id=#{id}
+			]]>
+		</if>
+		<if test='status != null and status != "" and status != "0,1,2,3,4,5" and status != "6,7" '>
+			<![CDATA[
+				and status=#{status}
+			]]>
+		</if>
+		<if test='status == "0,1,2,3,4,5" '>
+			<![CDATA[
+				and status in ('0','1','2','3','4','5')
+			]]>
+		</if>
+		<if test='status == "6,7" '>
+			<![CDATA[
+				and status in ('6','7')
+			]]>
+		</if>
+		<if test="visitorstatus != null and visitorstatus != ''">
+			<![CDATA[
+				and visitorstatus = #{visitorstatus}
+			]]>
+		</if>
+		<if test="firstarrivalflag != null and firstarrivalflag != ''">
+			<![CDATA[
+				and firstarrivalflag = #{firstarrivalflag}
+			]]>
+		</if>
+		<if test="finalarrivalflag != null and finalarrivalflag != ''">
+			<![CDATA[
+				and finalarrivalflag = #{finalarrivalflag}
+			]]>
+		</if>
+		<if test="filingflag != null and filingflag != ''">
+			<![CDATA[
+				and filingflag = #{filingflag}
+			]]>
+		</if>
+		<if test="maxopteratetime != null and maxopteratetime != ''">
+			<![CDATA[
+				and hour(timediff(operatetime,SYSDATE())) < #{maxopteratetime}
+			]]>
+		</if>
+		<if test="minopteratetime != null and minopteratetime != ''">
+			<![CDATA[
+				and hour(timediff(operatetime,SYSDATE())) >= #{minopteratetime}
+			]]>
+		</if>
+		<if test="queryForPack != null and queryForPack != ''">
+			<![CDATA[
+				and (firstarrivalflag = '2' or paytype = '1')
+			]]>
+		</if>
+		<if test="queryForReplace != null and queryForReplace != ''">
+			<![CDATA[
+				and status in ('1','2','3','4','5','6','10')
+			]]>
+		</if>
+		<if test="stationcode != null and stationcode != ''">
+			<![CDATA[
+				and stationcode=#{stationcode}
+			]]>
+		</if>
+		<if test="visitorflag != null and visitorflag != ''">
+			<![CDATA[
+				and visitorflag=#{visitorflag}
+			]]>
+		</if>
+		<if test="salercode != null and salercode != ''">
+			<![CDATA[ 
+				and salercode=#{salercode}
+			]]>
+		</if>
+		<if test="talkercode != null and talkercode != ''">
+			<![CDATA[
+				and talkercode = #{talkercode}
+			]]>
+		</if>
+		<if test="visitorcode != null and visitorcode != ''">
+			<![CDATA[
+				and visitorcode = #{visitorcode}
+			]]>
+		</if>
+		<if test="begintime != null and begintime != ''">
+			<![CDATA[
+				and date(addtime) >= date(#{begintime})
+			]]>
+		</if>
+		<if test="endtime != null and endtime != ''">
+			<![CDATA[
+				and date(addtime) <= date(#{endtime})
+			]]>
+		</if>
+		<if test="productconfirm != null and productconfirm != ''">
+			<![CDATA[
+				and productconfirm = #{productconfirm}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Userorder">
+		<![CDATA[
+   			insert into userorder (ordercode,usercode,username,usersex,phone,address,source,visittype,salercode,talkercode,visitorcode,visitorstatus,productfee,otherfee,gaintotalmoney,totalmoney,discountfee,firstpayment,firstarrivalflag,finalpayment,finalarrivalflag,paytype,addtime,status,operatetime,filingflag,installercode,stationcode,
+   								   lockcoreflag,productcolor,visitorflag,productconfirm,modelcode,modelname,discountgain,fixedgain,managergain,managercode,orderinfo,remark) 
+   			               values(#{ordercode},#{usercode},#{username},#{usersex},#{phone},#{address},#{source},#{visittype},#{salercode},#{talkercode},#{visitorcode},#{visitorstatus},#{productfee},#{otherfee},#{gaintotalmoney},#{totalmoney},#{discountfee},#{firstpayment},#{firstarrivalflag},#{finalpayment},#{finalarrivalflag},#{paytype},#{addtime},#{status},#{operatetime},#{filingflag},#{installercode},#{stationcode},
+   			                      #{lockcoreflag},#{productcolor},#{visitorflag},#{productconfirm},#{modelcode},#{modelname},#{discountgain},#{fixedgain},#{managergain},#{managercode},#{orderinfo},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Userorder">
+		<![CDATA[
+			update userorder set ordercode=#{ordercode},usercode=#{usercode},username=#{username},usersex=#{usersex},phone=#{phone},address=#{address},source=#{source},visittype=#{visittype},
+			       salercode=#{salercode},talkercode=#{talkercode},visitorcode=#{visitorcode},visitorstatus=#{visitorstatus},productfee=#{productfee},otherfee=#{otherfee},gaintotalmoney=#{gaintotalmoney},totalmoney=#{totalmoney},discountfee=#{discountfee},firstpayment=#{firstpayment},
+			                     finalpayment=#{finalpayment},paytype=#{paytype},status=#{status},operatetime=#{operatetime},filingflag=#{filingflag},installercode=#{installercode},stationcode=#{stationcode},lockcoreflag=#{lockcoreflag},productcolor=#{productcolor},visitorflag=#{visitorflag},
+			                     productconfirm=#{productconfirm},modelcode=#{modelcode},modelname=#{modelname},discountgain=#{discountgain},fixedgain=#{fixedgain},managergain=#{managergain},managercode=#{managercode},orderinfo=#{orderinfo},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Userorder">
+		<![CDATA[
+			delete from userorder
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Userorder" resultType="Userorder">
+		<![CDATA[
+			select * from userorder
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Userorder" resultType="Integer">
+		<![CDATA[
+			select count(1) from userorder
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Userorder" resultType="Userorder">
+		<![CDATA[
+			select * from userorder 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Integer" resultType="Userorder">
+		<![CDATA[
+		 	select * from userorder
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByOrdercode" parameterType="String" resultType="Userorder">
+		<![CDATA[
+		 	select * from userorder where ordercode=#{ordercode}
+		]]>
+	</select>
+	
+	<update id="updateStatus" parameterType="Userorder">
+		<![CDATA[
+			update userorder set status=#{status},operatetime=#{operatetime}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<update id="updateCompleteState" parameterType="Userorder">
+		<![CDATA[
+			update userorder set status=#{status},operatetime=#{operatetime},installercode=#{installercode}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<update id="updateChe" parameterType="Userorder">
+		<![CDATA[
+			update userorder set status=#{status},operatetime=#{operatetime}
+		]]>	
+		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<update id="updateFirstarrival" parameterType="Userorder">
+		<![CDATA[
+			update userorder set firstarrivalflag = #{firstarrivalflag}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<update id="updateFinalarrival" parameterType="Userorder">
+		<![CDATA[
+			update userorder set finalarrivalflag = #{finalarrivalflag}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<update id="updatefilingflag" parameterType="Userorder">
+		<![CDATA[
+			update userorder set filingflag=#{filingflag}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<select id="findByPhone" parameterType="String" resultType="Userorder">
+		<![CDATA[
+		 	select * from userorder where phone=#{phone}
+		]]>
+	</select>
+	
+</mapper>

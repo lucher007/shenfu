@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IHttpForMpsDao">
+  
+	<select id="findTalkerListInfo" parameterType="Userorder" resultType="Userorder">
+		<![CDATA[ 
+			select * from userorder where visittype = '2' and  talkercode = #{talkercode}
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findVisitorListInfo" parameterType="Usertask" resultType="Usertask">
+		<![CDATA[ 
+			select * from usertask where visittype = '2' and visitorcode = #{visitorcode} and status = #{status}
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findTalkerAndVisitorListInfo" parameterType="Usertask" resultType="Usertask">
+		<![CDATA[ 
+			select * from usertask where visittype <> '2' and talkercode = #{talkercode} and visitorcode = #{visitorcode} and status = #{status}
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findChildrenSalerInfoListBySalercode" parameterType="Employee" resultType="Employee">
+		<![CDATA[ 
+			  select e.employeecode as employeecode, min(e.employeename) as employeename, min(e.phone)as phone, sum(ifnull(u.gainmoney,0)) as totalmoney ,count(u.id) as totalcount 
+			    from employee e LEFT JOIN (select * from salegaininfo where gainercode = #{employeecode} ) u on u.salercode = e.employeecode 
+			   where e.parentemployeecode = #{employeecode} 
+			group by e.employeecode
+			order by totalmoney desc, e.employeecode asc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findTotalChildrenSalerInfoListBySalercode" parameterType="Employee" resultType="Employee">
+		<![CDATA[
+			select sum(ifnull(u.gainmoney,0)) as totalmoney ,count(u.id) as totalcount 
+			  from employee e LEFT JOIN (select * from salegaininfo where gainercode = #{employeecode} ) u on u.salercode = e.employeecode 
+			 where e.parentemployeecode =  #{parentemployeecode} 
+		]]>
+	</select>
+	
+	<select id="findSalegaininfoStat" parameterType="Employee" resultType="Employee">
+		<![CDATA[
+			select * from (
+							select  (@i:=@i+1) as ranking, 
+							     data.* from (
+												select e.employeecode as employeecode, min(e.employeename) as employeename, min(e.phone)as phone, sum(ifnull(s.gainmoney,0)) as totalmoney
+						                          from employee e LEFT JOIN salegaininfo s on s.gainercode = e.employeecode 
+	     ]]>
+	     								<if test="department != null and department != ''">
+	     									<![CDATA[
+	     										 where e.department = #{department}
+											 ]]>			                        
+         								</if>   
+         <![CDATA[
+						                         group by e.employeecode
+						                         order by totalmoney desc, e.employeecode asc
+                                             ) data, (select   @i:=0) as  it 
+                          ) b  limit ${page_start},${rows}
+         ]]>
+	</select>
+	
+	<select id="findSalegaininfoStatByEmployeecode" parameterType="Employee" resultType="Employee">
+		<![CDATA[
+			select * from (
+							select  (@i:=@i+1) as ranking, 
+							     data.* from (
+												select e.employeecode as employeecode, min(e.employeename) as employeename, min(e.phone)as phone, sum(ifnull(s.gainmoney,0)) as totalmoney
+						                          from employee e LEFT JOIN salegaininfo s on s.gainercode = e.employeecode 
+		 ]]>
+	     								<if test="department != null and department != ''">
+	     									<![CDATA[
+	     										 where e.department = #{department}
+											 ]]>			                        
+         								</if>   
+         <![CDATA[				                     
+						                      group by e.employeecode
+						                      order by totalmoney desc, e.employeecode asc
+                                             ) data, (select   @i:=0) as it 
+                          ) b  where employeecode = #{employeecode}
+         ]]>
+	</select>
+	
+</mapper>

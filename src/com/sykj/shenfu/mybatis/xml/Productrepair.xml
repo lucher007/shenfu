@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IProductrepairDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="productidentfy != null and productidentfy != ''">
+			<![CDATA[
+				and productidentfy like concat('%',#{productidentfy},'%')
+			]]>
+		</if>
+		<if test="repairstatus != null and repairstatus != ''">
+			<![CDATA[
+				and repairstatus = #{repairstatus}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Productrepair">
+		<![CDATA[
+   			insert into productrepair (typecode,typename,productname,productcode,productidentfy,addtime,
+   									 operatorcode,productproblem,repairinfo,repairstatus,remark) 
+   			               values(#{typecode},#{typename},#{productname},#{productcode},#{productidentfy},#{addtime},
+   			               		  #{operatorcode},#{productproblem},#{repairinfo},#{repairstatus},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Productrepair">
+		<![CDATA[
+			update productrepair set typecode=#{typecode},typename=#{typename},productname=#{productname},productcode=#{productcode},productidentfy=#{productidentfy},
+									operatorcode=#{operatorcode},productproblem=#{productproblem},repairinfo=#{repairinfo},repairstatus=#{repairstatus},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Productrepair">
+		<![CDATA[
+			delete from productrepair
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Productrepair" resultType="Productrepair">
+		<![CDATA[
+			select * from productrepair
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Productrepair" resultType="Integer">
+		<![CDATA[
+			select count(1) from productrepair
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Productrepair" resultType="Productrepair">
+		<![CDATA[
+			select * from productrepair 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Productrepair" resultType="Productrepair">
+		<![CDATA[
+		 	select * from productrepair
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+</mapper>

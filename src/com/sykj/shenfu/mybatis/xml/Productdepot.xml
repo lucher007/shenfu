@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IProductdepotDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="productname != null and productname != ''">
+			<![CDATA[
+				and productname like concat('%',#{productname},'%')
+			]]>
+		</if>
+		<if test="productcode != null and productcode != ''">
+			<![CDATA[
+				and productcode = #{productcode}
+			]]>
+		</if>
+		<if test="productidentfy != null and productidentfy != ''">
+			<![CDATA[
+				and productidentfy like concat('%',#{productidentfy},'%')
+			]]>
+		</if>
+		<if test="productsource != null and productsource != ''">
+			<![CDATA[
+				and productsource = #{productsource}
+			]]>
+		</if>
+		<if test="typecode != null and typecode != ''">
+			<![CDATA[
+				and typecode = #{typecode}
+			]]>
+		</if>
+		<if test="typename != null and typename != ''">
+			<![CDATA[
+				and typename = #{typename}
+			]]>
+		</if>
+		<if test="productstatus != null and productstatus != ''">
+			<![CDATA[
+				and productstatus = #{productstatus}
+			]]>
+		</if>
+		<if test="depotstatus != null and depotstatus != ''">
+			<![CDATA[
+				and depotstatus = #{depotstatus}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Productdepot">
+		<![CDATA[
+   			insert into productdepot (typecode,typename,productcode,productname,productsource,productidentfy,depotamount,checkercode,producercode,productstatus,checkstatus,addtime,depotstatus,depotrackcode,suppliername,installinfo,operatorcode,inoutercode,productversion,remark) 
+   			               values(#{typecode},#{typename},#{productcode},#{productname},#{productsource},#{productidentfy},#{depotamount},#{checkercode},#{producercode},#{productstatus},#{checkstatus},#{addtime},#{depotstatus},#{depotrackcode},#{suppliername},#{installinfo},#{operatorcode},#{inoutercode},#{productversion},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Productdepot">
+		<![CDATA[
+			update productdepot set typecode=#{typecode},typename=#{typename},productcode=#{productcode},productname=#{productname},productsource=#{productsource},productidentfy=#{productidentfy},depotamount=#{depotamount},
+								checkercode=#{checkercode},producercode=#{producercode},productstatus=#{productstatus},checkstatus=#{checkstatus},depotstatus=#{depotstatus},depotrackcode=#{depotrackcode},suppliername=#{suppliername},installinfo=#{installinfo},operatorcode=#{operatorcode},inoutercode=#{inoutercode},productversion=#{productversion},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<update id="updateDepotamount" parameterType="Productdepot">
+		<![CDATA[
+			update productdepot set depotamount=#{depotamount}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Productdepot">
+		<![CDATA[
+			delete from productdepot
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Productdepot" resultType="Productdepot">
+		<![CDATA[
+			select * from productdepot
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Productdepot" resultType="Integer">
+		<![CDATA[
+			select count(1) from productdepot
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Productdepot" resultType="Productdepot">
+		<![CDATA[
+			select * from productdepot 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Productdepot" resultType="Productdepot">
+		<![CDATA[
+		 	select * from productdepot
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByProductidentfy" parameterType="String" resultType="Productdepot">
+		<![CDATA[
+		 	select * from productdepot where productidentfy = #{productidentfy}
+		]]>
+	</select>
+	
+	<select id="findByProductcode" parameterType="String" resultType="Productdepot">
+		<![CDATA[
+			select * from productdepot where productcode = #{productcode}
+		]]>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	
+</mapper>

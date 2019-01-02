@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ISalegaininfoDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">	
+		<if test="gainercode != null and gainercode != ''">
+			<![CDATA[
+				and gainercode=#{gainercode}
+			]]>
+		</if>			
+		<if test="ordercode != null and ordercode != ''">
+			<![CDATA[
+				and ordercode=#{ordercode}
+			]]>
+		</if>
+		<if test="status != null and status != ''">
+			<![CDATA[
+				and status=#{status}
+			]]>
+		</if>
+		<if test="gaincode != null and gaincode != ''">
+			<![CDATA[
+				and gaincode=#{gaincode}
+			]]>
+		</if>
+		<if test="gainlogcode != null and gainlogcode != ''">
+			<![CDATA[
+				and gainlogcode=#{gainlogcode}
+			]]>
+		</if>
+		<if test="begintime != null and begintime != ''">
+			<![CDATA[
+				and date(addtime) >= date(#{begintime})
+			]]>
+		</if>
+		<if test="endtime != null and endtime != ''">
+			<![CDATA[
+				and date(addtime) <= date(#{endtime})
+			]]>
+		</if>
+		<if test="ids != null and ids != ''">
+			<![CDATA[
+				and id in (${ids})
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Salegaininfo">
+		<![CDATA[
+   			insert into salegaininfo (gainercode,usercode,username,phone,address,source,visittype,taskcode,salercode,visitorcode,ordercode,totalmoney,gaincode,gainname,gainrate,gainmoney,energyscore,energyinfoid,addtime,status,gaintime,gainlogcode,remark) 
+   			               values(#{gainercode},#{usercode},#{username},#{phone},#{address},#{source},#{visittype},#{taskcode},#{salercode},#{visitorcode},#{ordercode},#{totalmoney},#{gaincode},#{gainname},#{gainrate},#{gainmoney},#{energyscore},#{energyinfoid},#{addtime},#{status},#{gaintime},#{gainlogcode},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Salegaininfo">
+		<![CDATA[
+			update salegaininfo set gainercode=#{gainercode},usercode=#{usercode},username=#{username},phone=#{phone},address=#{address},source=#{source},visittype=#{visittype},
+			       taskcode=#{taskcode},salercode=#{salercode},visitorcode=#{visitorcode},ordercode=#{ordercode},totalmoney=#{totalmoney},gaincode=#{gaincode},
+			                     gainname=#{gainname},gainrate=#{gainrate},gainmoney=#{gainmoney},energyscore=#{energyscore},energyinfoid=#{energyinfoid},status=#{status},gaintime=#{gaintime},gainlogcode=#{gainlogcode},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Salegaininfo">
+		<![CDATA[
+			delete from salegaininfo
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Salegaininfo" resultType="Salegaininfo">
+		<![CDATA[
+			select * from salegaininfo
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ordercode desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Salegaininfo" resultType="Integer">
+		<![CDATA[
+			select count(1) from salegaininfo
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Salegaininfo" resultType="Salegaininfo">
+		<![CDATA[
+			select * from salegaininfo 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ordercode desc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Integer" resultType="Salegaininfo">
+		<![CDATA[
+		 	select * from salegaininfo
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<update id="updateStatus" parameterType="Salegaininfo">
+		<![CDATA[
+			update salegaininfo set status=#{status},gaintime=#{gaintime},gainlogcode=#{gainlogcode}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<select id="findGaintotalmoney" parameterType="Salegaininfo" resultType="Long">
+		<![CDATA[
+			select sum(gainmoney) from salegaininfo 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="findEnergytotalscore" parameterType="Salegaininfo" resultType="Long">
+		<![CDATA[
+			select sum(energyscore) from salegaininfo 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	
+	<!-- 员工提成汇总 -->
+	<select id="findSalegaininfoStat" parameterType="Salegaininfo" resultType="Salegaininfo">
+		<![CDATA[
+			select gainercode, group_concat(id) as ids, sum(gainmoney) as gainmoney from salegaininfo
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			group by gainercode
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findSalegaininfoStatCount" parameterType="Salegaininfo" resultType="Integer">
+		<![CDATA[
+			select count(*) from (
+					               select gainercode, group_concat(id) as ids, sum(gainmoney) as gainmoney from salegaininfo
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			                       group by gainercode
+			                     ) as t
+		 	
+		]]>		
+	</select>
+	
+	<select id="querySalegaininfoStat" parameterType="Salegaininfo" resultType="Salegaininfo">
+		<![CDATA[
+			select gainercode, group_concat(id) as ids, sum(gainmoney) as gainmoney from salegaininfo
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			group by gainercode
+		 	order by ${sort} ${order}
+		]]>		
+	</select>
+	
+	<delete id="deleteByOrdercode" parameterType="String">
+		<![CDATA[
+			delete from salegaininfo where ordercode = #{ordercode}
+		]]>		
+	</delete>
+	
+</mapper>

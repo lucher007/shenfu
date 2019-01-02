@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ICoderuleDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="codetype != null and codetype != ''">
+			<![CDATA[
+				and codetype = #{codetype}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Coderule">
+		<![CDATA[
+   			insert into coderule (codetype,precode,sufcode,codevalue,remark) 
+   			               values(#{codetype},#{precode},#{sufcode},#{codevalue},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Coderule">
+		<![CDATA[
+			update coderule set codetype=#{codetype},precode=#{precode},sufcode=#{sufcode},codevalue=#{codevalue},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Coderule">
+		<![CDATA[
+			delete from coderule
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Coderule" resultType="Coderule">
+		<![CDATA[
+			select * from coderule
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Coderule" resultType="Integer">
+		<![CDATA[
+			select count(1) from coderule
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Coderule" resultType="Coderule">
+		<![CDATA[
+			select * from coderule 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Coderule" resultType="Coderule">
+		<![CDATA[
+		 	select * from coderule
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByCodetypeStr" parameterType="String" resultType="Coderule">
+		<![CDATA[
+		 	select * from coderule where codetype = #{codetype}
+		]]>
+	</select>
+	
+</mapper>

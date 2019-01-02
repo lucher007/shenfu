@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ICellextendDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">		
+		<if test="extendcode != null and extendcode != ''">
+			<![CDATA[
+				and extendcode like concat('%',#{extendcode},'%')
+			]]>
+		</if>
+	    <if test="cellcode != null and cellcode != ''">
+			<![CDATA[
+				and cellcode like concat('%',#{cellcode},'%')
+			]]>
+		</if>
+		<if test="cellname != null and cellname != ''">
+			<![CDATA[
+				and cellname like concat('%',#{cellname},'%')
+			]]>
+		</if>
+		<if test="address != null and address != ''">
+			<![CDATA[
+				and address like concat('%',#{address},'%')
+			]]>
+		</if>
+		<if test="acceptflag != null and acceptflag != ''">
+			<![CDATA[
+				and acceptflag = #{acceptflag}
+			]]>
+		</if>
+		<if test="payflag != null and payflag != ''">
+			<![CDATA[
+				and payflag = #{payflag}
+			]]>
+		</if>
+		<if test="acceptercode != null and acceptercode != ''">
+			<![CDATA[
+				and acceptercode = #{acceptercode}
+			]]>
+		</if>
+		<if test="stationflag != null and stationflag != ''">
+			<![CDATA[
+				and stationflag = #{stationflag}
+			]]>
+		</if>		
+	</sql>
+	
+	<insert id="save" parameterType="Cellextend">
+		<![CDATA[
+   			insert into cellextend (extendcode,cellcode,cellname,address,totalhouse,price,totalmoney,extendercode,extendtime,starttime,endtime,acceptflag,acceptercode,acceptertime,payflag,paytime,stationflag,remark) 
+   			               values(#{extendcode},#{cellcode},#{cellname},#{address},#{totalhouse},#{price},#{totalmoney},#{extendercode},#{extendtime},#{starttime},#{endtime},#{acceptflag},#{acceptercode},#{acceptertime},#{payflag},#{paytime},#{stationflag},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Cellextend">
+		<![CDATA[
+			update cellextend set extendcode=#{extendcode},cellcode=#{cellcode},cellname=#{cellname},address=#{address},totalhouse=#{totalhouse},price=#{price},totalmoney=#{totalmoney},extendercode=#{extendercode},extendtime=#{extendtime},
+							starttime=#{starttime},endtime=#{endtime},acceptflag=#{acceptflag},acceptercode=#{acceptercode},acceptertime=#{acceptertime},payflag=#{payflag},paytime=#{paytime},stationflag=#{stationflag},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Cellextend">
+		<![CDATA[
+			delete from cellextend
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Cellextend" resultType="Cellextend">
+		<![CDATA[
+			select * from cellextend
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Cellextend" resultType="Integer">
+		<![CDATA[
+			select count(1) from cellextend
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Cellextend" resultType="Cellextend">
+		<![CDATA[
+			select * from cellextend 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Cellextend" resultType="Cellextend">
+		<![CDATA[
+		 	select * from cellextend
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<insert id="saveBatch" parameterType="java.util.List">
+       <![CDATA[
+        INSERT IGNORE INTO cellextend (extendcode,cellcode,cellname,address,totalhouse,price,totalmoney,extendercode,extendtime,starttime,endtime,acceptercode,acceptertime,payflag,paytime,stationflag,remark)  
+        VALUES
+        ]]>	
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+	            #{item.extendcode},
+	            #{item.cellcode},
+	            #{item.cellname},
+	            #{item.address},         
+	            #{item.totalhouse},
+	            #{item.price},
+	            #{item.totalmoney},
+	            #{item.extendercode},
+	            #{item.extendtime},
+	            #{item.starttime},
+	            #{item.endtime},
+	            #{item.acceptercode},
+	            #{item.acceptertime},
+	            #{item.payflag},
+	            #{item.paytime},
+	            #{item.stationflag},
+	            #{item.remark}
+            )
+        </foreach>
+    </insert>
+	
+	<select id="findByExtendcode" parameterType="String" resultType="Cellextend">
+		<![CDATA[
+		 	select * from cellextend where extendcode = #{extendcode}
+		]]>
+	</select>
+	
+</mapper>

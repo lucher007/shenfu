@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IMaterialcheckDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="materialcode != null and materialcode != ''">
+			<![CDATA[
+				and materialcode = #{materialcode}
+			]]>
+		</if>
+		<if test="materialname != null and materialname != ''">
+			<![CDATA[
+				and materialname = #{materialname}
+			]]>
+		</if>
+		<if test="materialidentfy != null and materialidentfy != ''">
+			<![CDATA[
+				and materialidentfy = #{materialidentfy}
+			]]>
+		</if>
+		<if test="batchno != null and batchno != ''">
+			<![CDATA[
+				and batchno = #{batchno}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Materialcheck">
+		<![CDATA[
+   			insert into materialcheck (materialcode,materialname,batchno,materialidentfy,checkinfo,repairinfo,checkercode,checktime,checkstatus,hightemp,currentvoltage,displayscreen,touchscreen,messageconnect,openclosedoor,keystrokesound,fingerprint,remark) 
+   			                  values(#{materialcode},#{materialname},#{batchno},#{materialidentfy},#{checkinfo},#{repairinfo},#{checkercode},#{checktime},#{checkstatus},#{hightemp},#{currentvoltage},#{displayscreen},#{touchscreen},#{messageconnect},#{openclosedoor},#{keystrokesound},#{fingerprint},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Materialcheck">
+		<![CDATA[
+			update materialcheck set materialcode=#{materialcode},materialname=#{materialname},batchno=#{batchno},materialidentfy=#{materialidentfy},checkinfo=#{checkinfo},repairinfo=#{repairinfo},checkercode=#{checkercode},checktime=#{checktime},checkstatus=#{checkstatus},
+									hightemp=#{hightemp},currentvoltage=#{currentvoltage},displayscreen=#{displayscreen},touchscreen=#{touchscreen},messageconnect=#{messageconnect},openclosedoor=#{openclosedoor},keystrokesound=#{keystrokesound},fingerprint=#{fingerprint},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Materialcheck">
+		<![CDATA[
+			delete from materialcheck
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Materialcheck" resultType="Materialcheck">
+		<![CDATA[
+			select * from materialcheck
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Materialcheck" resultType="Integer">
+		<![CDATA[
+			select count(1) from materialcheck
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Materialcheck" resultType="Materialcheck">
+		<![CDATA[
+			select * from materialcheck 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Materialcheck" resultType="Materialcheck">
+		<![CDATA[
+		 	select * from materialcheck
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+</mapper>

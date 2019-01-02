@@ -1,0 +1,30 @@
+http://www.kuaidi100.com/query?type=shentong&postid=3354523521870 根据快递公司和快递单号查询物流信息 
+status为200：查询成功
+status为201:查询失败
+status为400：参数错误
+status为500：服务器错误
+
+
+http://www.kuaidi100.com/autonumber/autoComNum?resultv2=1&text=3354523521870
+{"comCode":"","num":"3354523521870",
+"auto":[{"comCode":"shentong","id":"","noCount":44227,"noPre":"335452","startTime":""},	{"comCode":"rufengda","id":"","noCount":10,"noPre":"335452","startTime":""},	{"comCode":"yunda","id":"","noCount":1,"noPre":"335452","startTime":""}]}
+
+http://www.kuaidi100.com/autonumber/auto?num=3354523521870 根据快递单号查询物流公司
+
+[{"comCode":"debangwuliu","id":"","noCount":29,"noPre":"561460","startTime":""}]
+
+
+
+if msg=='参数错误':  
+            print('您输入的快递单号有误，请重新输入：')  
+        else:  
+            print('您的单号已过期 ') 
+
+
+
+#存放公司代号字典  
+kd_dict={1:'shentong',2:'ems',3:'shunfeng',4:'yuantong',5:'zhongtong',6:'yunda',7:'quanfengkuaidi',8:'debangwuliu',9:'zhaijisong',10:'tiantian',11:'huitongkuaidi'}
+
+
+
+http://blog.csdn.net/sj18839125621/article/details/79180860

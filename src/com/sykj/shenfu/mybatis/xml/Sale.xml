@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ISaleDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">		
+	    <if test="username != null and username != ''">
+			<![CDATA[
+				and username like concat('%',#{username},'%')
+			]]>
+		</if>
+		<if test="phone != null and phone != ''">
+			<![CDATA[
+				and phone like concat('%',#{phone},'%')
+			]]>
+		</if>		
+		<if test="saleno != null and saleno != ''">
+			<![CDATA[
+				and saleno like concat('%',#{saleno},'%')
+			]]>
+		</if>
+		<if test="address != null and address != ''">
+			<![CDATA[
+				and address like concat('%',#{address},'%')
+			]]>
+		</if>
+		<if test="status != null and status != ''">
+			<![CDATA[
+				and status =#{status}
+			]]>
+		</if>
+		<if test="id != null and id != ''">
+			<![CDATA[
+				and id=#{id}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Sale">
+		<![CDATA[
+   			insert into sale (saleno,userid,username,usersex,phone,address,source,salerid,operatorid,intention,status,addtasktime,content,addtime,totalmoney,firstpayment,finalpayment,remark) 
+   			               values(#{saleno},#{userid},#{username},#{usersex},#{phone},#{address},#{source},#{salerid},#{operatorid},#{intention},
+   			                      #{status},#{addtasktime},#{content},#{addtime},#{totalmoney},#{firstpayment},#{finalpayment},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Sale">
+		<![CDATA[
+			update sale set saleno=#{saleno},userid=#{userid},username=#{username},usersex=#{usersex},phone=#{phone},address=#{address},source=#{source},
+			                salerid=#{salerid},operatorid=#{operatorid},intention=#{intention},status=#{status},addtasktime=#{addtasktime},content=#{content},
+			                totalmoney=#{totalmoney},firstpayment=#{firstpayment},finalpayment=#{finalpayment},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Sale">
+		<![CDATA[
+			delete from sale
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Sale" resultType="Sale">
+		<![CDATA[
+			select * from sale
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Sale" resultType="Integer">
+		<![CDATA[
+			select count(1) from sale
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Sale" resultType="Sale">
+		<![CDATA[
+			select * from sale 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Sale" resultType="Sale">
+		<![CDATA[
+		 	select * from sale
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findBySalenoStr" parameterType="String" resultType="Sale">
+		<![CDATA[
+		 	select * from sale where saleno = #{saleno}
+		]]>
+	</select>
+	
+	<select id="findMaxSaleno" resultType="String">
+		<![CDATA[
+		 	select max(saleno) from sale  
+		]]>
+	</select>
+	
+	<select id="findListByTotalstat" parameterType="Sale" resultType="Sale">
+		<![CDATA[
+			select salerid,count(*) as saletotal,sum(totalmoney) as saletotalmoney
+			from sale where status = '5'
+		]]>
+		<if test="querystarttime != null and querystarttime != ''">
+			<![CDATA[
+				AND date(addtasktime) >= date(#{querystarttime})
+			]]>
+		</if>
+		<if test="queryendtime != null and queryendtime != ''">
+			<![CDATA[
+				AND date(addtasktime) <= date(#{queryendtime})
+			]]>
+		</if>
+		<![CDATA[
+			GROUP BY salerid order by saletotalmoney desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findCountByTotalstat" parameterType="Sale" resultType="Integer">
+		<![CDATA[
+			select count(t.salerid) 
+			from (
+				  select salerid,count(*) as saletotal,sum(totalmoney) as saletotalmoney 
+				    from sale where status = '5'
+		]]>
+		<if test="querystarttime != null and querystarttime != ''">
+			<![CDATA[
+				     AND date(addtasktime) >= date(#{querystarttime})
+			]]>
+		</if>
+		<if test="queryendtime != null and queryendtime != ''">
+			<![CDATA[
+				     AND date(addtasktime) <= date(#{queryendtime})
+			]]>
+		</if>
+		<![CDATA[
+			     GROUP BY salerid order by saletotalmoney) t;
+		]]>
+	</select>
+	
+	<select id="queryListByTotalstat" parameterType="Sale" resultType="Sale">
+		<![CDATA[
+			select salerid,count(*) as saletotal,sum(totalmoney) as saletotalmoney
+			from sale where status = '5'
+		]]>
+		<if test="querystarttime != null and querystarttime != ''">
+			<![CDATA[
+				AND date(addtasktime) >= date(#{querystarttime})
+			]]>
+		</if>
+		<if test="queryendtime != null and queryendtime != ''">
+			<![CDATA[
+				AND date(addtasktime) <= date(#{queryendtime})
+			]]>
+		</if>
+		<![CDATA[
+			GROUP BY salerid order by saletotalmoney desc 
+		]]>
+	</select>
+	
+	
+	
+	<select id="findListByPersonalstat" parameterType="Sale" resultType="Sale">
+		<![CDATA[
+			select  DATE_FORMAT(addtasktime,'%m') as opertime, COUNT(*) as saletotal ,sum(totalmoney) as saletotalmoney
+			  from  sale  
+			 where status = '5'
+		]]>
+		<if test="salerid != null and salerid != ''">
+			<![CDATA[
+				AND salerid = #{salerid}
+			]]>
+		</if>
+		<if test="opertime != null and opertime != ''">
+			<![CDATA[
+				AND DATE_FORMAT(addtasktime,'%Y') = #{opertime}
+			]]>
+		</if>
+		<![CDATA[
+			GROUP BY DATE_FORMAT(addtasktime,'%m') 
+			order by DATE_FORMAT(addtasktime,'%m') asc
+		]]>
+	</select>
+	
+</mapper>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IDepotrackDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="depotrackcode != null and depotrackcode != ''">
+			<![CDATA[
+				and depotrackcode like concat('%',#{depotrackcode},'%')
+			]]>
+		</if>
+		<if test="depotrackname != null and depotrackname != ''">
+			<![CDATA[
+				and depotrackname like concat('%',#{depotrackname},'%')
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Depotrack">
+		<![CDATA[
+   			insert into depotrack (depotrackcode,depotrackname,rownums,columnnums,racknum,remark) 
+   			               values(#{depotrackcode},#{depotrackname},#{rownums},#{columnnums},#{racknum},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Depotrack">
+		<![CDATA[
+			update depotrack set depotrackcode=#{depotrackcode},depotrackname=#{depotrackname},rownums=#{rownums},
+			                columnnums=#{columnnums},racknum=#{racknum},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Depotrack">
+		<![CDATA[
+			delete from depotrack
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Depotrack" resultType="Depotrack">
+		<![CDATA[
+			select * from depotrack
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Depotrack" resultType="Integer">
+		<![CDATA[
+			select count(1) from depotrack
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Depotrack" resultType="Depotrack">
+		<![CDATA[
+			select * from depotrack 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Depotrack" resultType="Depotrack">
+		<![CDATA[
+		 	select * from depotrack
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByDepotrackcode" parameterType="String" resultType="Depotrack">
+		<![CDATA[
+		 	select * from depotrack where depotrackcode = #{depotrackcode}
+		]]>
+	</select>
+	
+</mapper>

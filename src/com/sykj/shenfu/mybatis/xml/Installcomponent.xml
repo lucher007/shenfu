@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IInstallcomponentDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="producecode != null and producecode != ''">
+			<![CDATA[
+				and producecode = #{producecode}
+			]]>
+		</if>
+		<if test="materialcode != null and materialcode != ''">
+			<![CDATA[
+				and materialcode = #{materialcode}
+			]]>
+		</if>
+		<if test="materialname != null and materialname != ''">
+			<![CDATA[
+				and materialname = #{materialname}
+			]]>
+		</if>
+		<if test="materialidentfy != null and materialidentfy != ''">
+			<![CDATA[
+				and materialidentfy = #{materialidentfy}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Installcomponent">
+		<![CDATA[
+   			insert into installcomponent (producecode,materialcode,materialname,materialbatchno,materialidentfy,componentcode,componentname,componentmodel,batchno,amount,depotrackcode,addtime,remark) 
+   			                  values(#{producecode},#{materialcode},#{materialname},#{materialbatchno},#{materialidentfy},#{componentcode},#{componentname},#{componentmodel},#{batchno},#{amount},#{depotrackcode},#{addtime},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+   <insert id="saveBatch" parameterType="java.util.List">
+       <![CDATA[
+        INSERT IGNORE INTO installcomponent (producecode,materialcode,materialname,materialbatchno,materialidentfy,componentcode,componentname,componentmodel,batchno,amount,depotrackcode,addtime,remark) 	
+        VALUES
+        ]]>	
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.producecode},
+            #{item.materialcode},
+            #{item.materialname},
+            #{item.materialbatchno},
+            #{item.materialidentfy},
+            #{item.componentcode},
+            #{item.componentname},
+            #{item.componentmodel},
+            #{item.batchno},
+            #{item.amount},
+            #{item.depotrackcode},
+            #{item.addtime},
+            #{item.remark}
+            )
+        </foreach>
+    </insert>
+   
+	<update id="update" parameterType="Installcomponent">
+		<![CDATA[
+			update installcomponent set producecode=#{producecode},materialcode=#{materialcode},materialname=#{materialname},materialbatchno=#{materialbatchno},
+										materialidentfy=#{materialidentfy},componentcode=#{componentcode},componentname=#{componentname},componentmodel=#{componentmodel},
+										batchno=#{batchno},amount=#{amount},depotrackcode=#{depotrackcode},addtime=#{addtime},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Installcomponent">
+		<![CDATA[
+			delete from installcomponent
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<delete id="deleteBatchByProducecode" parameterType="String">
+		<![CDATA[
+			delete from installcomponent where producecode=#{producecode}
+		]]>		
+	</delete>
+	
+	<delete id="deleteBatchByMaterialidentfy" parameterType="String">
+		<![CDATA[
+			delete from installcomponent where materialidentfy=#{materialidentfy}
+		]]>		
+	</delete>
+	
+	<select id="findByList" parameterType="Installcomponent" resultType="Installcomponent">
+		<![CDATA[
+			select * from installcomponent
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Installcomponent" resultType="Integer">
+		<![CDATA[
+			select count(1) from installcomponent
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Installcomponent" resultType="Installcomponent">
+		<![CDATA[
+			select * from installcomponent 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Installcomponent" resultType="Installcomponent">
+		<![CDATA[
+		 	select * from installcomponent
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByProducecode" parameterType="String" resultType="Installcomponent">
+		<![CDATA[
+		 	select * from installcomponent where producecode=#{producecode}
+		]]>
+	</select>
+	
+	<select id="findByMaterialidentfy" parameterType="String" resultType="Installcomponent">
+		<![CDATA[
+		 	select * from installcomponent where materialidentfy=#{materialidentfy}
+		]]>
+	</select>
+	
+	<select id="queryListByProducecode" parameterType="Installcomponent" resultType="Installcomponent">
+		<![CDATA[
+			select *,sum(amount) as totalamount
+			  from installcomponent 
+			 where producecode = #{producecode}  
+			 group by producecode,componentcode
+		     order by ${sort} ${order} 
+		]]>
+	</select>
+	
+	<select id="findCountByProducecode" parameterType="Installcomponent" resultType="Integer">
+		<![CDATA[
+			select count(*) from (
+				                   select *,sum(amount) as totalamount 
+							         from installcomponent 
+							        where producecode = #{producecode}  
+							     group by producecode,componentcode
+						         order by ${sort} ${order}
+		    ) a
+		]]>
+	</select>
+	
+</mapper>

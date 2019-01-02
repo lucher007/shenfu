@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IUserproductreplaceDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="usercode != null and usercode != ''">
+			<![CDATA[
+				and usercode like concat('%',#{usercode},'%')
+			]]>
+		</if>
+		<if test="ordercode != null and ordercode != ''">
+			<![CDATA[
+				and ordercode like concat('%',#{ordercode},'%')
+			]]>
+		</if>
+		<if test="replacetype != null and replacetype != ''">
+			<![CDATA[
+				and replacetype  = #{replacetype}
+			]]>
+		</if>
+		<if test="productidentfy != null and productidentfy != ''">
+			<![CDATA[
+				and ( oldproductidentfy like concat('%',#{productidentfy},'%') or newproductidentfy like concat('%',#{productidentfy},'%') )
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Userproductreplace">
+		<![CDATA[
+   			insert into userproductreplace (usercode,ordercode,modelname,modelcode,typecode,typename,productname,productcode,addtime,
+   									 operatorcode,visittime,visitreasons,replacetype,oldproductidentfy,oldproductversion,newproductidentfy,newproductversion,
+   									 oldproductstatus,oldproductproblem,rebackremark,remark) 
+   			               values(#{usercode},#{ordercode},#{modelname},#{modelcode},#{typecode},#{typename},#{productname},#{productcode},#{addtime},
+   			               		  #{operatorcode},#{visittime},#{visitreasons},#{replacetype},#{oldproductidentfy},#{oldproductversion},#{newproductidentfy},#{newproductversion},
+   			               		  #{oldproductstatus},#{oldproductproblem},#{rebackremark},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Userproductreplace">
+		<![CDATA[
+			update userproductreplace set usercode=#{usercode},ordercode=#{ordercode},modelname=#{modelname},modelcode=#{modelcode},typecode=#{typecode},typename=#{typename},
+									productname=#{productname},productcode=#{productcode},operatorcode=#{operatorcode},visittime=#{visittime},visitreasons=#{visitreasons},replacetype=#{replacetype},oldproductidentfy=#{oldproductidentfy},
+									oldproductversion=#{oldproductversion},newproductidentfy=#{newproductidentfy},newproductversion=#{newproductversion},oldproductstatus=#{oldproductstatus},oldproductproblem=#{oldproductproblem},rebackremark=#{rebackremark},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Userproductreplace">
+		<![CDATA[
+			delete from userproductreplace
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Userproductreplace" resultType="Userproductreplace">
+		<![CDATA[
+			select * from userproductreplace
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Userproductreplace" resultType="Integer">
+		<![CDATA[
+			select count(1) from userproductreplace
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Userproductreplace" resultType="Userproductreplace">
+		<![CDATA[
+			select * from userproductreplace 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Userproductreplace" resultType="Userproductreplace">
+		<![CDATA[
+		 	select * from userproductreplace
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+</mapper>

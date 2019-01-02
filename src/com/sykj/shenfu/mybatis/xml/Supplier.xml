@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ISupplierDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="name != null and name != ''">
+			<![CDATA[
+				and name like concat('%',#{name},'%')
+			]]>
+		</if>
+		<if test="fullname != null and fullname != ''">
+			<![CDATA[
+				and fullname like concat('%',#{fullname},'%')
+			]]>
+		</if>
+		<if test="contactname != null and contactname != ''">
+			<![CDATA[
+				and contactname like concat('%',#{contactname},'%')
+			]]>
+		</if>
+		<if test="contactphone != null and contactphone != ''">
+			<![CDATA[
+				and contactphone like concat('%',#{contactphone},'%')
+			]]>
+		</if>
+		<if test="status != null and status != ''">
+			<![CDATA[
+				and status = #{status}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Supplier">
+		<![CDATA[
+   			insert into supplier (name,fullname,address,phone,contactname,contactphone,
+   			                      contactmail,status,creatercode,createdate,modifiercode,modifydate,introduceinfo,remark) 
+   			               values(#{name},#{fullname},#{address},#{phone},#{contactname},#{contactphone},
+   			                      #{contactmail},#{status},#{creatercode},#{createdate},#{modifiercode},#{modifydate},#{introduceinfo},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Supplier">
+		<![CDATA[
+			update supplier set name=#{name},fullname=#{fullname},address=#{address},phone=#{phone},
+								contactname=#{contactname},contactphone=#{contactphone},
+								contactmail=#{contactmail},status=#{status},modifiercode=#{modifiercode},modifydate=#{modifydate},introduceinfo=#{introduceinfo},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Supplier">
+		<![CDATA[
+			delete from supplier
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Supplier" resultType="Supplier">
+		<![CDATA[
+			select * from supplier
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Supplier" resultType="Integer">
+		<![CDATA[
+			select count(1) from supplier
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Supplier" resultType="Supplier">
+		<![CDATA[
+			select * from supplier 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Supplier" resultType="Supplier">
+		<![CDATA[
+		 	select * from supplier
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+</mapper>

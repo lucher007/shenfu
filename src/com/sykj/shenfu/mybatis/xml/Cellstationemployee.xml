@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ICellstationemployeeDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">		
+	    <if test="stationcode != null and stationcode != ''">
+			<![CDATA[
+				and stationcode like concat('%',#{stationcode},'%')
+			]]>
+		</if>
+		<if test="employeecode != null and employeecode != ''">
+			<![CDATA[
+				and employeecode like concat('%',#{employeecode},'%')
+			]]>
+		</if>
+		<if test="employeetype != null and employeetype != ''">
+			<![CDATA[
+				and employeetype = #{employeetype}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Cellstationemployee">
+		<![CDATA[
+   			insert into cellstationemployee (stationcode,extendcode,cellcode,cellname,address,starttime,endtime,employeetype,employeecode,employeename,phone,remark) 
+   			               values(#{stationcode},#{extendcode},#{cellcode},#{cellname},#{address},#{starttime},#{endtime},#{employeetype},#{employeecode},#{employeename},#{phone},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Cellstationemployee">
+		<![CDATA[
+			update cellstationemployee set stationcode=#{stationcode},extendcode=#{extendcode},cellcode=#{cellcode},cellname=#{cellname},address=#{address},starttime=#{starttime},endtime=#{endtime},employeetype=#{employeetype},employeecode=#{employeecode},employeename=#{employeename},phone=#{phone},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Cellstationemployee">
+		<![CDATA[
+			delete from cellstationemployee
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<delete id="deleteByStationcode" parameterType="String">
+		<![CDATA[
+			delete from cellstationemployee where stationcode = #{stationcode}
+		]]>		
+	</delete>
+	
+	<select id="findByList" parameterType="Cellstationemployee" resultType="Cellstationemployee">
+		<![CDATA[
+			select * from cellstationemployee
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by employeetype asc,id desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Cellstationemployee" resultType="Integer">
+		<![CDATA[
+			select count(1) from cellstationemployee
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Cellstationemployee" resultType="Cellstationemployee">
+		<![CDATA[
+			select * from cellstationemployee 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by employeetype asc,id desc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Cellstationemployee" resultType="Cellstationemployee">
+		<![CDATA[
+		 	select * from cellstationemployee
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByStationcode" parameterType="String" resultType="Cellstationemployee">
+		<![CDATA[
+		 	select * from cellstationemployee where stationcode = #{stationcode}
+		]]>
+	</select>
+	
+	<select id="findByStationcodeAndEmployeecode" resultType="Cellstationemployee">
+		<![CDATA[
+		 	select * from cellstationemployee where stationcode = #{stationcode} and employeecode = #{employeecode} and employeetype = #{employeetype}
+		]]>
+	</select>
+	
+	<select id="findByEmployeecodeAndStratEndtime" resultType="Cellstationemployee">
+		<![CDATA[
+		 	select * from cellstationemployee 
+					where employeecode = #{employeecode}
+					and  (
+					       (date(starttime) <= date(#{starttime}) and date(#{starttime})  <= date(endtime)) or 
+					       (date(starttime) <= date(#{endtime}) and date(#{endtime})      <= date(endtime)) or
+					       (date(starttime) >  date(#{starttime}) and date(#{endtime})    > date(endtime))
+					    )
+		]]>
+	</select>
+	
+	
+</mapper>

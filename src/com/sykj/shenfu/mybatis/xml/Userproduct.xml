@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IUserproductDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="usercode != null and usercode != ''">
+			<![CDATA[
+				and usercode like concat('%',#{usercode},'%')
+			]]>
+		</if>
+		<if test="ordercode != null and ordercode != ''">
+			<![CDATA[
+				and ordercode like concat('%',#{ordercode},'%')
+			]]>
+		</if>
+		<if test="productidentfy != null and productidentfy != ''">
+			<![CDATA[
+				and productidentfy=#{productidentfy}
+			]]>
+		</if>
+		<if test="productsource != null and productsource != ''">
+			<![CDATA[
+				and productsource=#{productsource}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Userproduct">
+		<![CDATA[
+   			insert into userproduct (usercode,ordercode,productidentfy,modelname,modelcode,typecode,typename,productname,productcode,productunit,price,saleprice,addtime,inoutercode,buytype,depotrackcode,productsource,productversion,remark) 
+   			               values(#{usercode},#{ordercode},#{productidentfy},#{modelname},#{modelcode},#{typecode},#{typename},#{productname},#{productcode},#{productunit},#{price},#{saleprice},#{addtime},#{inoutercode},#{buytype},#{depotrackcode},#{productsource},#{productversion},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Userproduct">
+		<![CDATA[
+			update userproduct set usercode=#{usercode},ordercode=#{ordercode},productidentfy=#{productidentfy},modelname=#{modelname},modelcode=#{modelcode},typecode=#{typecode},typename=#{typename},
+									productname=#{productname},productcode=#{productcode},productunit=#{productunit},price=#{price},saleprice=#{saleprice},inoutercode=#{inoutercode},buytype=#{buytype},
+									depotrackcode=#{depotrackcode},productsource=#{productsource},productversion=#{productversion},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<update id="updateProductidentfy" parameterType="Userproduct">
+		<![CDATA[
+			update userproduct set productidentfy=#{productidentfy}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Userproduct">
+		<![CDATA[
+			delete from userproduct
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<delete id="deleteByOrdercode" parameterType="String">
+		<![CDATA[
+			delete from userproduct where ordercode=#{ordercode}
+		]]>		
+	</delete>
+	
+	<select id="findByList" parameterType="Userproduct" resultType="Userproduct">
+		<![CDATA[
+			select * from userproduct
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Userproduct" resultType="Integer">
+		<![CDATA[
+			select count(1) from userproduct
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Userproduct" resultType="Userproduct">
+		<![CDATA[
+			select * from userproduct 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Userproduct" resultType="Userproduct">
+		<![CDATA[
+		 	select * from userproduct
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByProductidentfy" parameterType="String" resultType="Userproduct">
+		<![CDATA[
+		 	select * from userproduct where productidentfy = #{productidentfy}
+		]]>
+	</select>
+	
+	<select id="findUserproductListByOrdercode" parameterType="String" resultType="Userproduct">
+		<![CDATA[
+		 	select * from userproduct where ordercode = #{ordercode}
+		]]>
+	</select>
+	
+</mapper>

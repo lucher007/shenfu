@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IMaterialdepotDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">	
+	    <if test="materialcode != null and materialcode != ''">
+			<![CDATA[
+				and d.materialcode like concat('%',#{materialcode},'%')
+			]]>
+		</if>			
+		<if test="materialname != null and materialname != ''">
+			<![CDATA[
+				and d.materialname like concat('%',#{materialname},'%')
+			]]>
+		</if>
+		<if test="depotstatus != null and depotstatus != ''">
+			<![CDATA[
+				and d.depotstatus = #{depotstatus}
+			]]>
+		</if>
+		<if test="depotrackcode != null and depotrackcode != ''">
+			<![CDATA[
+				and d.depotrackcode = #{depotrackcode}
+			]]>
+		</if>
+		<if test='depotamountlevel == "0"'>
+			<![CDATA[
+				and d.depotamount > m.depotamount
+			]]>
+		</if>
+		<if test='depotamountlevel == "1"'>
+			<![CDATA[
+				and (d.depotamount > 0 && d.depotamount <= m.depotamount)
+			]]>
+		</if>
+		<if test='depotamountlevel == "2"'>
+			<![CDATA[
+				and d.depotamount = 0
+			]]>
+		</if>
+		<if test="batchno != null and batchno != ''">
+			<![CDATA[
+				and d.batchno like concat('%',#{batchno},'%')
+			]]>
+		</if>
+		<if test="materialidentfy != null and materialidentfy != ''">
+			<![CDATA[
+				and d.materialidentfy like concat('%',#{materialidentfy},'%')
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Materialdepot">
+		<![CDATA[
+   			insert into materialdepot (materialcode,materialname,operatorcode,batchno,depotamount,addtime,inoutercode,depotstatus,depotrackcode,suppliername,materialidentfy,materialsource,producercode,materialstatus,installinfo,materialversion,remark) 
+   			               values(#{materialcode},#{materialname},#{operatorcode},#{batchno},#{depotamount},#{addtime},#{inoutercode},#{depotstatus},#{depotrackcode},#{suppliername},#{materialidentfy},#{materialsource},#{producercode},#{materialstatus},#{installinfo},#{materialversion},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Materialdepot">
+		<![CDATA[
+			update materialdepot set materialcode=#{materialcode},materialname=#{materialname},operatorcode=#{operatorcode},batchno=#{batchno},depotamount=#{depotamount},
+										addtime=#{addtime},inoutercode=#{inoutercode},depotstatus=#{depotstatus},depotrackcode=#{depotrackcode},suppliername=#{suppliername},materialidentfy=#{materialidentfy},materialsource=#{materialsource},producercode=#{producercode},materialstatus=#{materialstatus},
+										installinfo=#{installinfo},materialversion=#{materialversion},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<update id="updateDepotamount" parameterType="Materialdepot">
+		<![CDATA[
+			update materialdepot set depotamount = #{depotamount}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Materialdepot">
+		<![CDATA[
+			delete from materialdepot
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Materialdepot" resultType="Materialdepot">
+		<![CDATA[
+			select d.*, m.depotamount as alarmdepotamount from materialdepot d left join material m on d.materialcode = m.materialcode
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by d.${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Materialdepot" resultType="Integer">
+		<![CDATA[
+			select count(1) from materialdepot d left join material m on d.materialcode = m.materialcode
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Materialdepot" resultType="Materialdepot">
+		<![CDATA[
+			select d.*, m.depotamount as alarmdepotamount from materialdepot d left join material m on d.materialcode = m.materialcode
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by d.${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Materialdepot" resultType="Materialdepot">
+		<![CDATA[
+		 	select * from materialdepot
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByBatchno" parameterType="String" resultType="Materialdepot">
+		<![CDATA[
+		 	select * from materialdepot where batchno = #{batchno} order by materialidentfy asc
+		]]>
+	</select>
+	
+	<select id="findByMaterialidentfy" parameterType="String" resultType="Materialdepot">
+		<![CDATA[
+		 	select * from materialdepot where materialidentfy = #{materialidentfy}
+		]]>
+	</select>
+	
+	<select id="queryMatarialListGroupByBatchno" parameterType="Materialdepot" resultType="Materialdepot">
+		<![CDATA[
+		 	select min(materialcode)   as materialcode,
+		 	       min(materialname)   as materialname,
+		 	       min(depotrackcode)  as depotrackcode,
+		 	       batchno,
+		 	       sum(depotamount)  as depotamount
+		 	  from materialdepot
+		 	  where 1 = 1
+		]]>
+		<if test="depotstatus != null and depotstatus != ''">
+			<![CDATA[
+				and depotstatus = #{depotstatus}
+			]]>
+		</if>	
+		<if test="materialstatus != null and materialstatus != ''">
+			<![CDATA[
+				and materialstatus = #{materialstatus}
+			]]>
+		</if>
+		<if test="materialcode != null and materialcode != ''">
+			<![CDATA[
+				and materialcode = #{materialcode}
+			]]>
+		</if>	
+		<![CDATA[
+		 	  group by batchno order by batchno asc
+		]]>
+	</select>
+	
+	<select id="findMatarialGroupByBatchno" parameterType="Materialdepot" resultType="Materialdepot">
+		<![CDATA[
+		 	select 
+		 		   min(id)             as id,
+		 		   min(materialcode)   as materialcode,
+		 	       min(materialname)   as materialname,
+		 	       min(operatorcode)   as operatorcode,
+		 	       batchno,
+		 	       sum(depotamount)  as depotamount,
+		 	       min(addtime)  as addtime,
+		 	       min(inoutercode)  as inoutercode,
+		 	       min(depotstatus)  as depotstatus,
+		 	       min(depotrackcode)  as depotrackcode,
+		 	       min(suppliername)  as suppliername,
+		 	       min(materialidentfy)  as materialidentfy,
+		 	       min(materialsource)  as materialsource,
+		 	       min(producercode)  as producercode,
+		 	       min(materialstatus)  as materialstatus,
+		 	       min(installinfo)  as installinfo,
+		 	       min(materialversion)  as materialversion
+		 	  from materialdepot
+		 	  where batchno = #{batchno}
+		]]>
+		<if test="depotstatus != null and depotstatus != ''">
+			<![CDATA[
+				and depotstatus = #{depotstatus}
+			]]>
+		</if>	
+		<if test="materialstatus != null and materialstatus != ''">
+			<![CDATA[
+				and materialstatus = #{materialstatus}
+			]]>
+		</if>
+		<if test="materialcode != null and materialcode != ''">
+			<![CDATA[
+				and materialcode = #{materialcode}
+			]]>
+		</if>
+		<![CDATA[
+		 	  group by batchno
+		]]>
+	</select>
+	
+	<select id="findMinIdentfyByBatchno" parameterType="Materialdepot" resultType="Materialdepot">
+		<![CDATA[
+			select * from materialdepot where materialidentfy=(
+			
+		 		select min(materialidentfy) from materialdepot 
+		 		where batchno = #{batchno} 
+		]]>
+					<if test="depotstatus != null and depotstatus != ''">
+						<![CDATA[
+							and depotstatus = #{depotstatus}
+						]]>
+					</if>	
+					<if test="materialstatus != null and materialstatus != ''">
+						<![CDATA[
+							and materialstatus = #{materialstatus}
+						]]>
+					</if>
+					<if test="materialcode != null and materialcode != ''">
+						<![CDATA[
+							and materialcode = #{materialcode}
+						]]>
+					</if>
+		<![CDATA[
+			)
+		]]>
+	</select>
+	
+</mapper>

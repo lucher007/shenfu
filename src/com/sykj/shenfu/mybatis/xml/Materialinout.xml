@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IMaterialinoutDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="materialcode != null and materialcode != ''">
+			<![CDATA[
+				and materialcode like concat('%',#{materialcode},'%')
+			]]>
+		</if>
+		<if test="materialname != null and materialname != ''">
+			<![CDATA[
+				and materialname like concat('%',#{materialname},'%')
+			]]>
+		</if>
+		<if test="type != null and type != ''">
+			<![CDATA[
+				and type = #{type}
+			]]>
+		</if>
+		<if test="inoutercode != null and inoutercode != ''">
+			<![CDATA[
+				and inoutercode = #{inoutercode}
+			]]>
+		</if>
+		<if test="inoutstatus != null and inoutstatus != ''">
+			<![CDATA[
+				and inoutstatus = #{inoutstatus}
+			]]>
+		</if>
+		<if test="begintime != null and begintime != ''">
+			<![CDATA[
+				and date(addtime) >= date(#{begintime})
+			]]>
+		</if>
+		<if test="endtime != null and endtime != ''">
+			<![CDATA[
+				and date(addtime) <= date(#{endtime})
+			]]>
+		</if>
+		<if test="batchno != null and batchno != ''">
+			<![CDATA[
+				and batchno like concat('%',#{batchno},'%')
+			]]>
+		</if>
+		<if test="materialidentfy != null and materialidentfy != ''">
+			<![CDATA[
+				and materialidentfy like concat('%',#{materialidentfy},'%')
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Materialinout">
+		<![CDATA[
+   			insert into materialinout (materialcode,materialname,operatorcode,batchno,type,inoutamount,addtime,inoutercode,inoutstatus,depotrackcode,materialidentfy,remark) 
+   			               values(#{materialcode},#{materialname},#{operatorcode},#{batchno},#{type},#{inoutamount},#{addtime},#{inoutercode},#{inoutstatus},#{depotrackcode},#{materialidentfy},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Materialinout">
+		<![CDATA[
+			update materialinout set materialcode=#{materialcode},materialname=#{materialname},operatorcode=#{operatorcode},
+								batchno=#{batchno},type=#{type},inoutamount=#{inoutamount},inoutercode=#{inoutercode},inoutstatus=#{inoutstatus},depotrackcode=#{depotrackcode},materialidentfy=#{materialidentfy},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Materialinout">
+		<![CDATA[
+			delete from materialinout
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Materialinout" resultType="Materialinout">
+		<![CDATA[
+			select * from materialinout
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Materialinout" resultType="Integer">
+		<![CDATA[
+			select count(1) from materialinout
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Materialinout" resultType="Materialinout">
+		<![CDATA[
+			select * from materialinout 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Materialinout" resultType="Materialinout">
+		<![CDATA[
+		 	select * from materialinout
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	
+	<select id="findMaterialinoutStat" parameterType="Materialinout" resultType="Materialinout">
+		<![CDATA[
+			select materialcode,materialname,type,sum(inoutamount) as totalinoutamount from materialinout 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			group by materialcode,materialname,type
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findMaterialinoutStatCount" parameterType="Materialinout" resultType="Integer">
+		<![CDATA[
+			select count(*) from (
+					               select materialcode,materialname,type,sum(inoutamount) from materialinout
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			                        group by materialcode,materialname,type
+			                     ) as t
+		 	
+		]]>		
+	</select>
+	
+	<select id="queryMaterialinoutStat" parameterType="Materialinout" resultType="Materialinout">
+		<![CDATA[
+			select materialcode,materialname,type,sum(inoutamount) as totalinoutamount from materialinout 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			group by materialcode,materialname,type
+		 	order by ${sort} ${order}
+		]]>		
+	</select>
+	
+</mapper>

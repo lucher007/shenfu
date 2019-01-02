@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IProductinoutDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="productname != null and productname != ''">
+			<![CDATA[
+				and productname like concat('%',#{productname},'%')
+			]]>
+		</if>
+		<if test="productcode != null and productcode != ''">
+			<![CDATA[
+				and productcode like concat('%',#{productcode},'%')
+			]]>
+		</if>
+		<if test="type != null and type != ''">
+			<![CDATA[
+				and type = #{type}
+			]]>
+		</if>
+		<if test="productidentfy != null and productidentfy != ''">
+			<![CDATA[
+				and productidentfy like concat('%',#{productidentfy},'%')
+			]]>
+		</if>
+		<if test="inoutstatus != null and inoutstatus != ''">
+			<![CDATA[
+				and inoutstatus = #{inoutstatus}
+			]]>
+		</if>
+		<if test="inoutercode != null and inoutercode != ''">
+			<![CDATA[
+				and inoutercode = #{inoutercode}
+			]]>
+		</if>
+		<if test="begintime != null and begintime != ''">
+			<![CDATA[
+				and date(addtime) >= date(#{begintime})
+			]]>
+		</if>
+		<if test="endtime != null and endtime != ''">
+			<![CDATA[
+				and date(addtime) <= date(#{endtime})
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Productinout">
+		<![CDATA[
+   			insert into productinout (productcode,productname,productidentfy,type,inoutercode,inoutamount,addtime,operatorcode,inoutstatus,depotrackcode,remark) 
+   			               values(#{productcode},#{productname},#{productidentfy},#{type},#{inoutercode},#{inoutamount},#{addtime},#{operatorcode},#{inoutstatus},#{depotrackcode},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Productinout">
+		<![CDATA[
+			update productinout set productcode=#{productcode},productname=#{productname},productidentfy=#{productidentfy},type=#{type},inoutercode=#{inoutercode},
+									inoutamount=#{inoutamount},operatorcode=#{operatorcode},inoutstatus=#{inoutstatus},depotrackcode=#{depotrackcode},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Productinout">
+		<![CDATA[
+			delete from productinout
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Productinout" resultType="Productinout">
+		<![CDATA[
+			select * from productinout
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Productinout" resultType="Integer">
+		<![CDATA[
+			select count(1) from productinout
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Productinout" resultType="Productinout">
+		<![CDATA[
+			select * from productinout 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Productinout" resultType="Productinout">
+		<![CDATA[
+		 	select * from productinout
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findProductinoutStat" parameterType="Productinout" resultType="Productinout">
+		<![CDATA[
+			select productcode,productname,type,sum(inoutamount) as totalinoutamount from productinout 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			group by productcode,productname,type
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findProductinoutStatCount" parameterType="Productinout" resultType="Integer">
+		<![CDATA[
+			select count(*) from (
+					               select productcode,productname,type,sum(inoutamount) from productinout
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			                        group by productcode,productname,type
+			                     ) as t
+		 	
+		]]>		
+	</select>
+	
+	<select id="queryProductinoutStat" parameterType="Productinout" resultType="Productinout">
+		<![CDATA[
+			select productcode,productname,type,sum(inoutamount) as totalinoutamount from productinout 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			group by productcode,productname,type
+		 	order by ${sort} ${order}
+		]]>		
+	</select>
+	
+</mapper>

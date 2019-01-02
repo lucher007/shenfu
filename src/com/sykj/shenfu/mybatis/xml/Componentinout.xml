@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IComponentinoutDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="componentcode != null and componentcode != ''">
+			<![CDATA[
+				and componentcode like concat('%',#{componentcode},'%')
+			]]>
+		</if>
+		<if test="componentname != null and componentname != ''">
+			<![CDATA[
+				and componentname like concat('%',#{componentname},'%')
+			]]>
+		</if>
+		<if test="componentmodel != null and componentmodel != ''">
+			<![CDATA[
+				and componentmodel like concat('%',#{componentmodel},'%')
+			]]>
+		</if>
+		<if test="type != null and type != ''">
+			<![CDATA[
+				and type = #{type}
+			]]>
+		</if>
+		<if test="inoutercode != null and inoutercode != ''">
+			<![CDATA[
+				and inoutercode = #{inoutercode}
+			]]>
+		</if>
+		<if test="inoutstatus != null and inoutstatus != ''">
+			<![CDATA[
+				and inoutstatus = #{inoutstatus}
+			]]>
+		</if>
+		<if test="begintime != null and begintime != ''">
+			<![CDATA[
+				and date(addtime) >= date(#{begintime})
+			]]>
+		</if>
+		<if test="endtime != null and endtime != ''">
+			<![CDATA[
+				and date(addtime) <= date(#{endtime})
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Componentinout">
+		<![CDATA[
+   			insert into componentinout (componentcode,componentname,componentmodel,operatorcode,batchno,type,inoutamount,addtime,inoutercode,inoutstatus,depotrackcode,remark) 
+   			               values(#{componentcode},#{componentname},#{componentmodel},#{operatorcode},#{batchno},#{type},#{inoutamount},#{addtime},#{inoutercode},#{inoutstatus},#{depotrackcode},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Componentinout">
+		<![CDATA[
+			update componentinout set componentcode=#{componentcode},componentname=#{componentname},componentmodel=#{componentmodel},operatorcode=#{operatorcode},
+								batchno=#{batchno},type=#{type},inoutamount=#{inoutamount},inoutercode=#{inoutercode},inoutstatus=#{inoutstatus},depotrackcode=#{depotrackcode},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Componentinout">
+		<![CDATA[
+			delete from componentinout
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Componentinout" resultType="Componentinout">
+		<![CDATA[
+			select * from componentinout
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Componentinout" resultType="Integer">
+		<![CDATA[
+			select count(1) from componentinout
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Componentinout" resultType="Componentinout">
+		<![CDATA[
+			select * from componentinout 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Componentinout" resultType="Componentinout">
+		<![CDATA[
+		 	select * from componentinout
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findComponentinoutStat" parameterType="Componentinout" resultType="Componentinout">
+		<![CDATA[
+			select componentcode,componentname,componentmodel,type,sum(inoutamount) as totalinoutamount from componentinout 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			group by componentcode,componentname,componentmodel,type
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findComponentinoutStatCount" parameterType="Componentinout" resultType="Integer">
+		<![CDATA[
+			select count(*) from (
+					               select componentcode,componentname,componentmodel,type,sum(inoutamount) from componentinout
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			                        group by componentcode,componentname,componentmodel,type
+			                     ) as t
+		 	
+		]]>		
+	</select>
+	
+	<select id="queryComponentinoutStat" parameterType="Componentinout" resultType="Componentinout">
+		<![CDATA[
+			select componentcode,componentname,componentmodel,type,sum(inoutamount) as totalinoutamount from componentinout 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			group by componentcode,componentname,componentmodel,type
+		 	order by ${sort} ${order}
+		]]>		
+	</select>
+	
+</mapper>

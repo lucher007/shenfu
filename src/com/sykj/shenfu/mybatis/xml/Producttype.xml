@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IProducttypeDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="typecode != null and typecode != ''">
+			<![CDATA[
+				and typecode like concat('%',#{typecode},'%')
+			]]>
+		</if>
+		<if test="typename != null and typename != ''">
+			<![CDATA[
+				and typename like concat('%',#{typename},'%')
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Producttype">
+		<![CDATA[
+   			insert into producttype (typecode,typename,remark) 
+   			              values(#{typecode},#{typename},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Producttype">
+		<![CDATA[
+			update producttype set typecode=#{typecode},typename=#{typename},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Producttype">
+		<![CDATA[
+			delete from producttype
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Producttype" resultType="Producttype">
+		<![CDATA[
+			select * from producttype
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by typecode asc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Producttype" resultType="Integer">
+		<![CDATA[
+			select count(1) from producttype
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Producttype" resultType="Producttype">
+		<![CDATA[
+			select * from producttype 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by typecode asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Producttype" resultType="Producttype">
+		<![CDATA[
+		 	select * from producttype
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByTypecode" parameterType="String" resultType="Producttype">
+		<![CDATA[
+		 	select * from producttype where typecode = #{typecode}
+		]]>
+	</select>
+	
+</mapper>

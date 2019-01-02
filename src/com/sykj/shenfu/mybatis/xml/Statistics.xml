@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IStatisticsDao">
+    
+	<select id="findMaterialBalanceStatList" parameterType="Statistics" resultType="Statistics">
+		<![CDATA[
+				  select aa.materialid,aa.materialcode,aa.materialname,aa.orderamount,bb.purchaseamount,md.depotamount
+					from (
+								     select b.materialid,b.materialcode,b.materialname,sum(b.amount) as orderamount 
+								       from userproduct up 
+								 RIGHT JOIN (
+													select * from userorder where (status = '0' or status = '1')
+											) uo on uo.id = up.orderid 
+								 RIGHT JOIN bom b on b.modelid = up.modelid 
+								   group by b.materialid,b.materialcode,b.materialname
+		                  ) aa
+		        LEFT JOIN (
+									 select pd.materialid,pd.materialcode,pd.materialname,sum(pd.amount) as purchaseamount
+									  from purchasedetail pd
+								RIGHT JOIN (
+												 select * from purchase where (status = '0' or status = '1')
+											) p on p.id = pd.purchaseid
+								  group by pd.materialid,pd.materialcode,pd.materialname
+						  ) bb on aa.materialid = bb.materialid
+		        LEFT JOIN materialdepot md on md.materialid = aa.materialid
+		]]>
+		<![CDATA[
+			order by aa.materialcode asc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findMaterialBalanceStatCount" parameterType="Statistics" resultType="Integer">
+		<![CDATA[
+			select count(1) from (
+				    select aa.materialid,aa.materialcode,aa.materialname,aa.requreamount,bb.purchaseamount,md.depotamount
+					from (
+								     select b.materialid,b.materialcode,b.materialname,sum(b.amount) as requreamount 
+								       from userproduct up 
+								 RIGHT JOIN (
+													select * from userorder where (status = '0' or status = '1')
+											) uo on uo.id = up.orderid 
+								 RIGHT JOIN bom b on b.modelid = up.modelid 
+								   group by b.materialid,b.materialcode,b.materialname
+		                  ) aa
+		        LEFT JOIN (
+									 select pd.materialid,pd.materialcode,pd.materialname,sum(pd.amount) as purchaseamount
+									  from purchasedetail pd
+								RIGHT JOIN (
+												 select * from purchase where (status = '0' or status = '1')
+											) p on p.id = pd.purchaseid
+								  group by pd.materialid,pd.materialcode,pd.materialname
+						  ) bb on aa.materialid = bb.materialid
+		        LEFT JOIN materialdepot md on md.materialid = aa.materialid
+			) abcd
+		]]>
+	</select>
+	
+</mapper>

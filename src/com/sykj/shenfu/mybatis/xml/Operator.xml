@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IOperatorDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">	
+	    <if test="1 == 1">
+			<![CDATA[
+				and employeecode <> '000000000001'
+			]]>
+		</if>			
+		<if test="loginname != null and loginname != ''">
+			<![CDATA[
+				and loginname like concat('%',#{loginname},'%')
+			]]>
+		</if>
+		<if test="status != null and status != ''">
+			<![CDATA[
+				and status = #{status}
+			]]>
+		</if>
+		<if test="operatortype != null and operatortype != ''">
+			<![CDATA[
+				and operatortype = #{queryoperatortype}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Operator">
+		<![CDATA[
+   			insert into operator (employeecode,loginname,password,operatortype,addtime,status,remark) 
+   			               values(#{employeecode},#{loginname},#{password},#{operatortype},#{addtime},#{status},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Operator">
+		<![CDATA[
+			update operator set employeecode=#{employeecode},loginname=#{loginname},operatortype=#{operatortype},status=#{status},remark=#{remark}
+			                    
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Operator">
+		<![CDATA[
+			delete from operator
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Operator" resultType="Operator">
+		<![CDATA[
+			select * from operator
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Operator" resultType="Integer">
+		<![CDATA[
+			select count(1) from operator
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Operator" resultType="Operator">
+		<![CDATA[
+			select * from operator 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Operator" resultType="Operator">
+		<![CDATA[
+		 	select * from operator
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByLoginname" parameterType="Operator" resultType="Operator">
+		<![CDATA[
+		 	select * from operator where loginname = #{loginname}
+		]]>
+	</select>
+	
+	<update id="updatePassword" parameterType="Operator">
+		<![CDATA[
+			update operator set password=#{password}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<select id="findByEmployeecode" parameterType="String" resultType="Operator">
+		<![CDATA[
+		 	select * from operator where employeecode = #{employeecode}
+		]]>
+	</select>
+	
+</mapper>

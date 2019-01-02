@@ -1,0 +1,5 @@
+.header{background:#226ab6;display:block;position:fixed; z-index: 200; font-size:16px;height:50px;line-height:50px;width: 100%;}
+
+.header .back{position:absolute;padding:0 10px;height:28px;margin:10px 10px;line-height:28px;font-size:14px;background-color:#226ab6;border-radius:3px;width:30px;color:#fff}
+
+.logo{color:#fff;font-size:20px;}

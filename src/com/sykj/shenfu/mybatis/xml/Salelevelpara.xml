@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ISalelevelparaDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="level != null and level != ''">
+			<![CDATA[
+				and level=#{level}
+			]]>
+		</if>
+		<if test="state != null and state != ''">
+			<![CDATA[
+				and state=#{state}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Salelevelpara">
+		<![CDATA[
+   			insert into salelevelpara (level,minscore,maxscore,reduce,state,remark) 
+   			               values(#{level},#{minscore},#{maxscore},#{reduce},#{state},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Salelevelpara">
+		<![CDATA[
+			update salelevelpara set level=#{level},minscore=#{minscore},maxscore=#{maxscore},reduce=#{reduce},state=#{state},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Salelevelpara">
+		<![CDATA[
+			delete from salelevelpara
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Salelevelpara" resultType="Salelevelpara">
+		<![CDATA[
+			select * from salelevelpara
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id asc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Salelevelpara" resultType="Integer">
+		<![CDATA[
+			select count(1) from salelevelpara
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Salelevelpara" resultType="Salelevelpara">
+		<![CDATA[
+			select * from salelevelpara 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by score asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Salelevelpara" resultType="Salelevelpara">
+		<![CDATA[
+		 	select * from salelevelpara
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findBySalescore" parameterType="BigDecimal" resultType="Salelevelpara">
+		<![CDATA[
+		 	select * from salelevelpara where minscore <= #{salescore} and maxscore > #{salescore}
+		]]>
+	</select>
+	
+</mapper>

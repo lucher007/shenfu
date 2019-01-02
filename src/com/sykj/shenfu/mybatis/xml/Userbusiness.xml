@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IUserbusinessDao">
+	<sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">	
+		<if test="operatorcode != null and operatorcode != ''">
+			<![CDATA[
+				and operatorcode = #{operatorcode}
+			]]>
+		</if>
+		<if test="businesstypekey != null and businesstypekey != ''">
+			<![CDATA[
+				and businesstypekey = #{businesstypekey}
+			]]>
+		</if>
+		<if test="usercode != null and usercode != ''">
+			<![CDATA[
+				and usercode like concat('%',#{usercode},'%')
+			]]>
+		</if>
+		<if test="taskcode != null and taskcode != ''">
+			<![CDATA[
+				and taskcode like concat('%',#{taskcode},'%')
+			]]>
+		</if>
+		<if test="ordercode != null and ordercode != ''">
+			<![CDATA[
+				and ordercode like concat('%',#{ordercode},'%')
+			]]>
+		</if>
+		<if test="dispatchcode != null and dispatchcode != ''">
+			<![CDATA[
+				and dispatchcode like concat('%',#{dispatchcode},'%')
+			]]>
+		</if>
+		<if test="source != null and source != ''">
+			<![CDATA[
+				and source = #{source}
+			]]>
+		</if>
+		
+	</sql>
+	
+	<select id="findByList" parameterType="Userbusiness" resultType="Userbusiness">
+		<![CDATA[
+			select * from userbusiness 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+		  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id desc limit ${page_start},${rows}
+		]]>		
+	</select>
+	
+	<select id="findByCount" parameterType="Userbusiness" resultType="Integer">
+		<![CDATA[
+			select count(1) from userbusiness 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+		  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Userbusiness" resultType="Userbusiness">
+		<![CDATA[
+			select * from userbusiness 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Integer"  resultType="Userbusiness" >
+		<![CDATA[
+		 	select * from userbusiness
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<insert id="save" parameterType="Userbusiness">
+		<![CDATA[
+			insert into userbusiness (operatorcode,businesstypekey,businesstypename,usercode,taskcode,ordercode,
+			                         dispatchcode,addtime,content,source,remark)
+			                values (#{operatorcode},#{businesstypekey},#{businesstypename},#{usercode},#{taskcode},#{ordercode},
+			                         #{dispatchcode},#{addtime},#{content},#{source},#{remark})				
+		]]>	
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+	
+	<update id="update" parameterType="Userbusiness">
+		<![CDATA[
+			update userbusiness set operatorcode=#{operatorcode},businesstypekey=#{businesstypekey},businesstypename=#{businesstypename},usercode=#{usercode},
+			             taskcode=#{taskcode},ordercode=#{ordercode},dispatchcode=#{dispatchcode},content=#{content},source=#{source},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Integer">
+		<![CDATA[
+			delete from userbusiness where id=#{id}
+		]]>		
+	</delete>
+	
+</mapper>

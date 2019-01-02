@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ICellDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="cellname != null and cellname != ''">
+			<![CDATA[
+				and cellname like concat('%',#{cellname},'%')
+			]]>
+		</if>
+		<if test="address != null and address != ''">
+			<![CDATA[
+				and address like concat('%',#{address},'%')
+			]]>
+		</if>
+		<if test="developer != null and developer != ''">
+			<![CDATA[
+				and developer like concat('%',#{developer},'%')
+			]]>
+		</if>
+		<if test="extendflag != null and extendflag != ''">
+			<![CDATA[
+				and extendflag = #{extendflag}
+			]]>
+		</if>
+		<if test="beginopentime != null and beginopentime != ''">
+			<![CDATA[
+				and date(opentime) >= date(#{beginopentime})
+			]]>
+		</if>
+		<if test="endopentime != null and endopentime != ''">
+			<![CDATA[
+				and date(opentime) <= date(#{endopentime})
+			]]>
+		</if>
+		<if test="beginhandtime != null and beginhandtime != ''">
+			<![CDATA[
+				and date(handtime) >= date(#{beginhandtime})
+			]]>
+		</if>
+		<if test="endhandtime != null and endhandtime != ''">
+			<![CDATA[
+				and date(handtime) <= date(#{endhandtime})
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Cell">
+		<![CDATA[
+   			insert into cell (cellcode,cellname,address,opentime,handtime,safelevel,developer,province,city,area,longitude,latitude,building,floor,totalhouse,layout,extendflag,userate,highlow,property,doorinfo,researchercode,advertisement,allowstation,remark) 
+   			               values(#{cellcode},#{cellname},#{address},#{opentime},#{handtime},#{safelevel},#{developer},#{province},#{city},#{area},#{longitude},#{latitude},#{building},#{floor},#{totalhouse},#{layout},#{extendflag},#{userate},#{highlow},#{property},#{doorinfo},#{researchercode},#{advertisement},#{allowstation},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Cell">
+		<![CDATA[
+			update cell set cellcode=#{cellcode},cellname=#{cellname},address=#{address},opentime=#{opentime},handtime=#{handtime},
+								safelevel=#{safelevel},developer=#{developer},province=#{province},city=#{city},area=#{area},longitude=#{longitude},latitude=#{latitude},
+								building=#{building},floor=#{floor},totalhouse=#{totalhouse},layout=#{layout},extendflag=#{extendflag},
+								userate=#{userate},highlow=#{highlow},property=#{property},doorinfo=#{doorinfo},researchercode=#{researchercode},advertisement=#{advertisement},allowstation=#{allowstation},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Cell">
+		<![CDATA[
+			delete from cell
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Cell" resultType="Cell">
+		<![CDATA[
+			select * from cell
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Cell" resultType="Integer">
+		<![CDATA[
+			select count(1) from cell
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Cell" resultType="Cell">
+		<![CDATA[
+			select * from cell 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Cell" resultType="Cell">
+		<![CDATA[
+		 	select * from cell
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<insert id="saveBatch" parameterType="java.util.List">
+       <![CDATA[
+        INSERT IGNORE INTO cell (cellcode,cellname,address,opentime,handtime,safelevel,developer,province,city,area,longitude,latitude,building,floor,totalhouse,layout,extendflag,userate,highlow,property,doorinfo,researchercode,advertisement,allowstation,remark) 
+        VALUES
+        ]]>	
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.cellcode},
+            #{item.cellname},
+            #{item.address},         
+            #{item.opentime},
+            #{item.handtime},
+            #{item.safelevel},
+            #{item.developer},
+            #{item.province},
+            #{item.city},
+            #{item.area},
+            #{item.longitude},
+            #{item.latitude},
+            #{item.building},
+            #{item.floor},  
+            #{item.totalhouse},  
+            #{item.layout}, 
+            #{item.extendflag},
+            #{item.userate},
+            #{item.highlow},
+            #{item.property},
+            #{item.extendflag},
+            #{item.researchercode},
+            #{item.advertisement},
+            #{item.allowstation},
+            #{item.remark}
+            )
+        </foreach>
+    </insert>
+	
+	<select id="findByCellcode" parameterType="String" resultType="Cell">
+		<![CDATA[
+		 	select * from cell where cellcode = #{cellcode}
+		]]>
+	</select>
+	
+</mapper>

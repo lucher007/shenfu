@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IComponentDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="componentcode != null and componentcode != ''">
+			<![CDATA[
+				and componentcode like concat('%',#{componentcode},'%')
+			]]>
+		</if>
+		<if test="componentname != null and componentname != ''">
+			<![CDATA[
+				and componentname like concat('%',#{componentname},'%')
+			]]>
+		</if>
+		<if test="componentmodel != null and componentmodel != ''">
+			<![CDATA[
+				and componentmodel like concat('%',#{componentmodel},'%')
+			]]>
+		</if>
+		<if test="componentstatus != null and componentstatus != ''">
+			<![CDATA[
+				and componentstatus = #{componentstatus}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Component">
+		<![CDATA[
+   			insert into component (componentcode,componentname,componentmodel,componentunit,depotamount,componentstatus,remark) 
+   			               values(#{componentcode},#{componentname},#{componentmodel},#{componentunit},#{depotamount},#{componentstatus},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Component">
+		<![CDATA[
+			update component set componentcode=#{componentcode},componentname=#{componentname},componentmodel=#{componentmodel},componentunit=#{componentunit},
+								componentstatus=#{componentstatus},depotamount=#{depotamount},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<update id="updateDepotamount" parameterType="Component">
+		<![CDATA[
+			update component set depotamount=#{depotamount}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Component">
+		<![CDATA[
+			delete from component
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Component" resultType="Component">
+		<![CDATA[
+			select * from component
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Component" resultType="Integer">
+		<![CDATA[
+			select count(1) from component
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Component" resultType="Component">
+		<![CDATA[
+			select * from component 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	
+	<select id="findById" parameterType="Component" resultType="Component">
+		<![CDATA[
+		 	select * from component
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByComponentcode" parameterType="String" resultType="Component">
+		<![CDATA[
+		 	select * from component where componentcode = #{componentcode}
+		]]>
+	</select>
+	
+</mapper>

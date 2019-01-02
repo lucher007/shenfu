@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ICellpaylogDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">		
+	    <if test="cellcode != null and cellcode != ''">
+			<![CDATA[
+				and cellcode like concat('%',#{cellcode},'%')
+			]]>
+		</if>
+		<if test="cellname != null and cellname != ''">
+			<![CDATA[
+				and cellname like concat('%',#{cellname},'%')
+			]]>
+		</if>
+		<if test="address != null and address != ''">
+			<![CDATA[
+				and address like concat('%',#{address},'%')
+			]]>
+		</if>
+		<if test="acceptercode != null and acceptercode != ''">
+			<![CDATA[
+				and acceptercode = #{acceptercode}
+			]]>
+		</if>	
+		<if test="paytype != null and paytype != ''">
+			<![CDATA[
+				and paytype = #{paytype}
+			]]>
+		</if>
+		<if test="checkstatus != null and checkstatus != ''">
+			<![CDATA[
+				and checkstatus = #{checkstatus}
+			]]>
+		</if>
+		<if test="paysource != null and paysource != ''">
+			<![CDATA[
+				and paysource = #{paysource}
+			]]>
+		</if>
+		<if test="beginpaytime != null and beginpaytime != ''">
+			<![CDATA[
+				and date(paytime) >= date(#{beginpaytime})
+			]]>
+		</if>
+		<if test="endpaytime != null and endpaytime != ''">
+			<![CDATA[
+				and date(paytime) <= date(#{endpaytime})
+			]]>
+		</if>
+		<if test="beginchecktime != null and beginchecktime != ''">
+			<![CDATA[
+				and date(checktime) >= date(#{beginchecktime})
+			]]>
+		</if>
+		<if test="endchecktime != null and endchecktime != ''">
+			<![CDATA[
+				and date(checktime) <= date(#{endchecktime})
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Cellpaylog">
+		<![CDATA[
+   			insert into cellpaylog (extendcode,cellcode,cellname,address,totalhouse,price,totalmoney,extendercode,extendtime,starttime,endtime,acceptercode,acceptertime,payercode,paytime,paytype,paymoney,paysource,checkercode,checktime,checkstatus,remark) 
+   			               values(#{extendcode},#{cellcode},#{cellname},#{address},#{totalhouse},#{price},#{totalmoney},#{extendercode},#{extendtime},#{starttime},#{endtime},#{acceptercode},#{acceptertime},#{payercode},#{paytime},#{paytype},#{paymoney},#{paysource},#{checkercode},#{checktime},#{checkstatus},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Cellpaylog">
+		<![CDATA[
+			update cellpaylog set extendcode=#{extendcode},cellcode=#{cellcode},cellname=#{cellname},address=#{address},totalhouse=#{totalhouse},price=#{price},totalmoney=#{totalmoney},extendercode=#{extendercode},extendtime=#{extendtime},
+							starttime=#{starttime},endtime=#{endtime},acceptercode=#{acceptercode},acceptertime=#{acceptertime},payercode=#{payercode},paytime=#{paytime},paytype=#{paytype},paymoney=#{paymoney},paysource=#{paysource},checkercode=#{checkercode},checktime=#{checktime},checkstatus=#{checkstatus},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Cellpaylog">
+		<![CDATA[
+			delete from cellpaylog
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Cellpaylog" resultType="Cellpaylog">
+		<![CDATA[
+			select * from cellpaylog
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Cellpaylog" resultType="Integer">
+		<![CDATA[
+			select count(1) from cellpaylog
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Cellpaylog" resultType="Cellpaylog">
+		<![CDATA[
+			select * from cellpaylog 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Cellpaylog" resultType="Cellpaylog">
+		<![CDATA[
+		 	select * from cellpaylog
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<!-- 财务到账统计 -->
+	<select id="cellpayarrivalStat" parameterType="Cellpaylog" resultType="Cellpaylog">
+  		<![CDATA[
+			SELECT         paytype, 
+				       sum(paymoney) as totalmoney,
+				     count(paytype) as totalcount 
+			    FROM cellpaylog
+			   where checkstatus = '1'
+		]]>
+		<if test="beginchecktime != null and beginchecktime != ''">
+	  		<![CDATA[
+				and date(checktime) >= #{beginchecktime}
+	        ]]>	  
+        </if>
+        <if test="endchecktime != null and endchecktime != ''">
+	  		<![CDATA[
+				and date(checktime) <= #{endchecktime}
+	        ]]>	  
+        </if>
+        <if test="paytype != null and paytype != ''">
+	  		<![CDATA[
+				and paytype = #{paytype}
+	        ]]>	  
+        </if>
+        <if test="paysource != null and paysource != ''">
+	  		<![CDATA[
+				and paysource = #{paysource}
+	        ]]>	  
+        </if>
+		<![CDATA[
+			GROUP BY paytype
+		]]>
+		<![CDATA[
+		 	order by totalmoney desc
+		]]>	
+    </select>
+	
+</mapper>

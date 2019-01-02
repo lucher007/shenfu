@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IProduceinfoDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="producecode != null and producecode != ''">
+			<![CDATA[
+				and producecode = #{producecode}
+			]]>
+		</if>
+		<if test="productcode != null and productcode != ''">
+			<![CDATA[
+				and productcode = #{productcode}
+			]]>
+		</if>
+		<if test="productname != null and productname != ''">
+			<![CDATA[
+				and productname = #{productname}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Produceinfo">
+		<![CDATA[
+   			insert into produceinfo (producecode,productcode,productname,amount,installinfo,productversion,producercode,operatorcode,addtime,remark) 
+   			                  values(#{producecode},#{productcode},#{productname},#{amount},#{installinfo},#{productversion},#{producercode},#{operatorcode},#{addtime},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Produceinfo">
+		<![CDATA[
+			update produceinfo set producecode=#{producecode},productcode=#{productcode},productname=#{productname},amount=#{amount},installinfo=#{installinfo},productversion=#{productversion},producercode=#{producercode},operatorcode=#{operatorcode},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Produceinfo">
+		<![CDATA[
+			delete from produceinfo
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Produceinfo" resultType="Produceinfo">
+		<![CDATA[
+			select * from produceinfo
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Produceinfo" resultType="Integer">
+		<![CDATA[
+			select count(1) from produceinfo
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Produceinfo" resultType="Produceinfo">
+		<![CDATA[
+			select * from produceinfo 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Produceinfo" resultType="Produceinfo">
+		<![CDATA[
+		 	select * from produceinfo
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByProducecode" parameterType="String" resultType="Produceinfo">
+		<![CDATA[
+		 	select * from produceinfo where producecode = #{producecode}
+		]]>
+	</select>
+	
+</mapper>

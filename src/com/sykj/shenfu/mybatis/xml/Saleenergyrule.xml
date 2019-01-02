@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ISaleenergyruleDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="energycode != null and energycode != ''">
+			<![CDATA[
+				and energycode = #{energycode}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Saleenergyrule">
+		<![CDATA[
+   			insert into saleenergyrule (energycode,energyname,energyrate,remark) 
+   			               values(#{energycode},#{energyname},#{energyrate},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Saleenergyrule">
+		<![CDATA[
+			update saleenergyrule set energycode=#{energycode},energyname=#{energyname},energyrate=#{energyrate},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Saleenergyrule">
+		<![CDATA[
+			delete from saleenergyrule
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Saleenergyrule" resultType="Saleenergyrule">
+		<![CDATA[
+			select * from saleenergyrule
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id asc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Saleenergyrule" resultType="Integer">
+		<![CDATA[
+			select count(1) from saleenergyrule
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Saleenergyrule" resultType="Saleenergyrule">
+		<![CDATA[
+			select * from saleenergyrule 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Saleenergyrule" resultType="Saleenergyrule">
+		<![CDATA[
+		 	select * from saleenergyrule
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByEnergycode" parameterType="String" resultType="Saleenergyrule">
+		<![CDATA[
+		 	select * from saleenergyrule where energycode = #{energycode}
+		]]>
+	</select>
+	
+</mapper>

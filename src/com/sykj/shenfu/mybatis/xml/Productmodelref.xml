@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IProductmodelrefDao">
+	<sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	<sql id="whereColumns">
+		<if test="modelcode != null and modelcode != ''">
+			<![CDATA[
+				and modelcode = #{modelcode}
+			]]>
+		</if>
+	</sql>
+
+
+	<select id="findByList" parameterType="Productmodelref"
+		resultType="Productmodelref">
+		<![CDATA[
+			select * from productmodelref 	
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns" />
+		</trim>
+		<![CDATA[
+		 	order by id desc limit ${page_start},${rows}
+		]]>
+	</select>
+
+	<select id="findByCount" parameterType="Productmodelref"
+		resultType="Integer">
+		<![CDATA[
+			select count(1) from productmodelref 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns" />
+		</trim>
+	</select>
+
+	<select id="queryByList" parameterType="Productmodelref"
+		resultType="Productmodelref">
+		<![CDATA[
+			select * from productmodelref 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns" />
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>
+	</select>
+
+
+
+	<select id="findById" parameterType="Integer" resultType="Productmodelref">
+		<![CDATA[
+		 	select * from productmodelref
+		]]>
+		<where>
+			<include refid="idColumns" />
+		</where>
+	</select>
+
+	<select id="findByModelcode" parameterType="String" resultType="Productmodelref">
+		<![CDATA[
+		 	select * from productmodelref where modelcode = #{modelcode}
+		]]>
+	</select>
+
+
+	<insert id="save" parameterType="Productmodelref">
+		<![CDATA[
+			insert into productmodelref (modelcode,modelname,typecode,typename,productcode,productname,remark) values (#{modelcode},#{modelname},#{typecode},#{typename},#{productcode},#{productname},#{remark})				
+		]]>
+		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+
+	<update id="update" parameterType="Productmodelref">
+		<![CDATA[
+			update productmodelref set modelcode=#{modelcode},modelname=#{modelname},typecode=#{typecode},typename=#{typename},productcode=#{productcode},productname=#{productname},remark=#{remark}
+		]]>
+		<where>
+			<include refid="idColumns" />
+		</where>
+	</update>
+
+	<delete id="delete" parameterType="Integer">
+		<![CDATA[
+			delete from productmodelref where id=#{id}
+		]]>
+	</delete>
+    
+    <delete id="deleteByModelcode" parameterType="String">
+		<![CDATA[
+			delete from productmodelref where modelcode=#{modelcode}
+		]]>
+	</delete>
+    
+	<insert id="saveBatch" parameterType="java.util.List">
+       <![CDATA[
+        INSERT IGNORE INTO productmodelref (modelcode,modelname,typecode,typename,productcode,productname,remark)	
+        VALUES
+        ]]>
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.modelcode},
+			#{item.modelname},
+			#{item.typecode},
+			#{item.typename},
+			#{item.productcode},
+			#{item.productname},
+			#{item.remark}
+			)
+		</foreach>
+	</insert>
+
+</mapper>

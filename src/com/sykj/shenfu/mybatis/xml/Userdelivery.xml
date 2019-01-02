@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IUserdeliveryDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="usercode != null and usercode != ''">
+			<![CDATA[
+				and usercode like concat('%',#{usercode},'%')
+			]]>
+		</if>
+		<if test="ordercode != null and ordercode != ''">
+			<![CDATA[
+				and ordercode like concat('%',#{ordercode},'%')
+			]]>
+		</if>
+		<if test="deliverercode != null and deliverercode != ''">
+			<![CDATA[
+				and deliverercode = #{deliverercode}
+			]]>
+		</if>
+		<if test="status != null and status != ''">
+			<![CDATA[
+				and status = #{status}
+			]]>
+		</if>
+		<if test="begintime != null and begintime != ''">
+			<![CDATA[
+				and date(deliverytime) >= date(#{begintime})
+			]]>
+		</if>
+		<if test="endtime != null and endtime != ''">
+			<![CDATA[
+				and date(deliverytime) <= date(#{endtime})
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Userdelivery">
+		<![CDATA[
+   			insert into userdelivery (usercode,ordercode,deliverycode,deliveryname,deliverytime,content,deliverercode,deliverername,delivererphone,status,remark) 
+   			               values(#{usercode},#{ordercode},#{deliverycode},#{deliveryname},#{deliverytime},#{content},#{deliverercode},#{deliverername},#{delivererphone},#{status},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Userdelivery">
+		<![CDATA[
+			update userdelivery set usercode=#{usercode},ordercode=#{ordercode},deliverycode=#{deliverycode},deliveryname=#{deliveryname},content=#{content},deliverercode=#{deliverercode},deliverername=#{deliverername},delivererphone=#{delivererphone},status=#{status},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Userdelivery">
+		<![CDATA[
+			delete from userdelivery
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<delete id="deleteByOrdercode" parameterType="String">
+		<![CDATA[
+			delete from userdelivery where ordercode=#{ordercode}
+		]]>		
+	</delete>
+	
+	<select id="findByList" parameterType="Userdelivery" resultType="Userdelivery">
+		<![CDATA[
+			select * from userdelivery
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Userdelivery" resultType="Integer">
+		<![CDATA[
+			select count(1) from userdelivery
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Userdelivery" resultType="Userdelivery">
+		<![CDATA[
+			select * from userdelivery 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Userdelivery" resultType="Userdelivery">
+		<![CDATA[
+		 	select * from userdelivery
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+</mapper>

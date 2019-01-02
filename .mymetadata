@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="shenfu"
+  id="myeclipse.1486363956203"
+  context-root="/shenfu"
+  j2ee-spec="6.0"
+  archive="shenfu.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

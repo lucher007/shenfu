@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IProduceproductDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="producecode != null and producecode != ''">
+			<![CDATA[
+				and producecode = #{producecode}
+			]]>
+		</if>
+		<if test="productcode != null and productcode != ''">
+			<![CDATA[
+				and productcode = #{productcode}
+			]]>
+		</if>
+		<if test="productname != null and productname != ''">
+			<![CDATA[
+				and productname = #{productname}
+			]]>
+		</if>
+		<if test="productidentfy != null and productidentfy != ''">
+			<![CDATA[
+				and productidentfy = #{productidentfy}
+			]]>
+		</if>
+		<if test="productstatus != null and productstatus != ''">
+			<![CDATA[
+				and productstatus = #{productstatus}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Produceproduct">
+		<![CDATA[
+   			insert into produceproduct (producecode,productcode,productname,productidentfy,depotamount,productstatus,printflag,addtime,remark) 
+   			                  values(#{producecode},#{productcode},#{productname},#{productidentfy},#{depotamount},#{productstatus},#{printflag},#{addtime},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+   <insert id="saveBatch" parameterType="java.util.List">
+       <![CDATA[
+        INSERT IGNORE INTO produceproduct (producecode,productcode,productname,productidentfy,depotamount,productstatus,printflag,addtime,remark) 	
+        VALUES
+        ]]>	
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.producecode},
+            #{item.productcode},
+            #{item.productname},
+            #{item.productidentfy},
+            #{item.depotamount},
+            #{item.productstatus},
+            #{item.printflag},
+            #{item.addtime},
+            #{item.remark}
+            )
+        </foreach>
+    </insert>
+   
+   
+	<update id="update" parameterType="Produceproduct">
+		<![CDATA[
+			update produceproduct set producecode=#{producecode},productcode=#{productcode},productname=#{productname},productidentfy=#{productidentfy},depotamount=#{depotamount},
+			                          productstatus=#{productstatus},printflag=#{printflag},addtime=#{addtime},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Produceproduct">
+		<![CDATA[
+			delete from produceproduct
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<delete id="deleteBatchByProducecode" parameterType="String">
+		<![CDATA[
+			delete from produceproduct where producecode=#{producecode}
+		]]>		
+	</delete>
+	
+	<select id="findByList" parameterType="Produceproduct" resultType="Produceproduct">
+		<![CDATA[
+			select * from produceproduct
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Produceproduct" resultType="Integer">
+		<![CDATA[
+			select count(1) from produceproduct
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Produceproduct" resultType="Produceproduct">
+		<![CDATA[
+			select * from produceproduct 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Produceproduct" resultType="Produceproduct">
+		<![CDATA[
+		 	select * from produceproduct
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByProductidentfy" parameterType="String" resultType="Produceproduct">
+		<![CDATA[
+		 	select * from produceproduct where productidentfy = #{productidentfy}
+		]]>
+	</select>
+	
+	<select id="findByProducecode" parameterType="String" resultType="Produceproduct">
+		<![CDATA[
+		 	select * from produceproduct where producecode=#{producecode}
+		]]>
+	</select>
+	
+</mapper>

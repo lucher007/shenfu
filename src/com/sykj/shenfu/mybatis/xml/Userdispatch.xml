@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IUserdispatchDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">	
+	   <if test="username != null and username != ''">
+			<![CDATA[
+				and username like concat('%',#{username},'%')
+			]]>
+		</if>
+		<if test="phone != null and phone != ''">
+			<![CDATA[
+				and phone like concat('%',#{phone},'%')
+			]]>
+		</if>	
+		<if test="address != null and address != ''">
+			<![CDATA[
+				and address like concat('%',#{address},'%')
+			]]>
+		</if>
+		<if test="source != null and source != ''">
+			<![CDATA[
+				and source=#{source}
+			]]>
+		</if>					
+		<if test="dispatchcode != null and dispatchcode != ''">
+			<![CDATA[
+				and dispatchcode like concat('%',#{dispatchcode},'%')
+			]]>
+		</if>
+		<if test="ordercode != null and ordercode != ''">
+			<![CDATA[
+				and ordercode like concat('%',#{ordercode},'%')
+			]]>
+		</if>
+		<if test="installercode != null and installercode != ''">
+			<![CDATA[
+				and installercode like concat('%',#{installercode},'%')
+			]]>
+		</if>
+		<if test="checkstatus != null and checkstatus != ''">
+			<![CDATA[
+				and checkstatus=#{checkstatus}
+			]]>
+		</if>
+		<if test="validstatus != null and validstatus != ''">
+			<![CDATA[
+				and validstatus=#{validstatus}
+			]]>
+		</if>
+		<if test="status != null and status != '' and status != '12' and status !='34' ">
+			<![CDATA[
+				and status=#{status}
+			]]>
+		</if>
+		<if test='status == "12"'>
+			<![CDATA[
+				and status in ('1','2')
+			]]>
+		</if>
+
+		<if test='status == "34"'>
+			<![CDATA[
+				and status in ('3','4')
+			]]>
+		</if>
+		
+	</sql>
+	
+	<insert id="save" parameterType="Userdispatch">
+		<![CDATA[
+   			insert into userdispatch (dispatchcode,usercode,username,usersex,phone,address,source,ordercode,installercode,operatorcode,addtime,installtime,content,dealdate,dealresult,status,checkstatus,checkresult,remark) 
+   			               values(#{dispatchcode},#{usercode},#{username},#{usersex},#{phone},#{address},#{source},#{ordercode},#{installercode},#{operatorcode},#{addtime},#{installtime},#{content},#{dealdate},#{dealresult},#{status},#{checkstatus},#{checkresult},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Userdispatch">
+		<![CDATA[
+			update userdispatch set dispatchcode=#{dispatchcode},usercode=#{dispatchcode},username=#{username},usersex=#{usersex},phone=#{phone},address=#{address},source=#{source},
+								ordercode=#{ordercode},installercode=#{installercode},operatorcode=#{operatorcode},
+								installtime=#{installtime},content=#{content},dealdate=#{dealdate},dealresult=#{dealresult},status=#{status},checkstatus=#{checkstatus},checkresult=#{checkresult},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Userdispatch">
+		<![CDATA[
+			delete from userdispatch
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Userdispatch" resultType="Userdispatch">
+		<![CDATA[
+			select * from userdispatch
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Userdispatch" resultType="Integer">
+		<![CDATA[
+			select count(1) from userdispatch
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Userdispatch" resultType="Userdispatch">
+		<![CDATA[
+			select * from userdispatch 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ${sort} ${order}
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Userdispatch" resultType="Userdispatch">
+		<![CDATA[
+		 	select * from userdispatch
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<update id="saveAssign" parameterType="Userdispatch">
+		<![CDATA[
+			update userdispatch set status = #{status}, installerid = #{installerid}			
+		]]>
+		<where>
+			<include refid="idColumns" />
+		</where>
+	</update>
+	
+	<update id="saveAccept" parameterType="Userdispatch">
+		<![CDATA[
+			update userdispatch set status = #{status}			
+		]]>
+		<where>
+			<include refid="idColumns" />
+		</where>
+	</update>
+	
+	<update id="saveReply" parameterType="Userdispatch">
+		<![CDATA[
+			update userdispatch set status = #{status},
+								dealresult = #{dealresult},
+								dealdate = #{dealdate}
+		]]>
+		<where>
+			<include refid="idColumns" />
+		</where>
+	</update>
+	
+	<update id="saveCheck" parameterType="Userdispatch">
+		<![CDATA[
+			update userdispatch set checkstatus = #{checkstatus},checkresult = #{checkresult}
+		]]>
+		<where>
+			<include refid="idColumns" />
+		</where>
+	</update>
+	
+	<select id="findByOrdercode" parameterType="String" resultType="Userdispatch">
+		<![CDATA[
+		 	select * from userdispatch where ordercode = #{ordercode}
+		]]>
+	</select>
+	
+	<select id="findByDispatchcode" parameterType="String" resultType="Userdispatch">
+		<![CDATA[
+		 	select * from userdispatch where dispatchcode = #{dispatchcode}
+		]]>
+	</select>
+	
+	<select id="findValidByOrdercode" parameterType="String" resultType="Userdispatch">
+		<![CDATA[
+		 	select * from userdispatch where ordercode = #{ordercode} and validstatus = '1'
+		]]>
+	</select>
+	
+	<update id="updateValidstatus" parameterType="Userdispatch">
+		<![CDATA[
+			update userdispatch set validstatus = #{validstatus}	
+		]]>
+		<where>
+			<include refid="idColumns" />
+		</where>
+	</update>
+	
+</mapper>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ISaleenergyinfoDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">	
+		<if test="gainercode != null and gainercode != ''">
+			<![CDATA[
+				and gainercode=#{gainercode}
+			]]>
+		</if>			
+		<if test="ordercode != null and ordercode != ''">
+			<![CDATA[
+				and ordercode=#{ordercode}
+			]]>
+		</if>
+		<if test="status != null and status != ''">
+			<![CDATA[
+				and status=#{status}
+			]]>
+		</if>
+		<if test="gaincode != null and gaincode != ''">
+			<![CDATA[
+				and gaincode=#{gaincode}
+			]]>
+		</if>
+		<if test="begintime != null and begintime != ''">
+			<![CDATA[
+				and date(addtime) >= date(#{begintime})
+			]]>
+		</if>
+		<if test="endtime != null and endtime != ''">
+			<![CDATA[
+				and date(addtime) <= date(#{endtime})
+			]]>
+		</if>
+		<if test="ids != null and ids != ''">
+			<![CDATA[
+				and id in (${ids})
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Saleenergyinfo">
+		<![CDATA[
+   			insert into saleenergyinfo (gainercode,usercode,username,phone,address,source,visittype,taskcode,salercode,visitorcode,ordercode,totalmoney,gaincode,gainname,gainrate,gainmoney,energyscore,addtime,status,exchangetime,operatorcode,remark) 
+   			               values(#{gainercode},#{usercode},#{username},#{phone},#{address},#{source},#{visittype},#{taskcode},#{salercode},#{visitorcode},#{ordercode},#{totalmoney},#{gaincode},#{gainname},#{gainrate},#{gainmoney},#{energyscore},#{addtime},#{status},#{exchangetime},#{operatorcode},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Saleenergyinfo">
+		<![CDATA[
+			update saleenergyinfo set gainercode=#{gainercode},usercode=#{usercode},username=#{username},phone=#{phone},address=#{address},source=#{source},visittype=#{visittype},
+			       taskcode=#{taskcode},salercode=#{salercode},visitorcode=#{visitorcode},ordercode=#{ordercode},totalmoney=#{totalmoney},gaincode=#{gaincode},
+			                     gainname=#{gainname},gainrate=#{gainrate},gainmoney=#{gainmoney},energyscore=#{energyscore},status=#{status},exchangetime=#{exchangetime},operatorcode=#{operatorcode},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Saleenergyinfo">
+		<![CDATA[
+			delete from saleenergyinfo
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Saleenergyinfo" resultType="Saleenergyinfo">
+		<![CDATA[
+			select * from saleenergyinfo
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by ordercode desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Saleenergyinfo" resultType="Integer">
+		<![CDATA[
+			select count(1) from saleenergyinfo
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Saleenergyinfo" resultType="Saleenergyinfo">
+		<![CDATA[
+			select * from saleenergyinfo 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by ordercode desc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Integer" resultType="Saleenergyinfo">
+		<![CDATA[
+		 	select * from saleenergyinfo
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<update id="updateStatus" parameterType="Saleenergyinfo">
+		<![CDATA[
+			update saleenergyinfo set status=#{status},exchangetime=#{exchangetime},operatorcode=#{operatorcode}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<select id="findGaintotalmoney" parameterType="Saleenergyinfo" resultType="Long">
+		<![CDATA[
+			select sum(gainmoney) from saleenergyinfo 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="findEnergytotalscore" parameterType="Saleenergyinfo" resultType="Long">
+		<![CDATA[
+			select sum(energyscore) from saleenergyinfo 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<!-- 员工提成汇总 -->
+	<select id="findSaleenergyinfoStat" parameterType="Saleenergyinfo" resultType="Saleenergyinfo">
+		<![CDATA[
+			select gainercode, group_concat(id) as ids, sum(gainmoney) as gainmoney, sum(energyscore) as energyscore from saleenergyinfo
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			group by gainercode
+			order by ${sort} ${order} limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findSaleenergyinfoStatCount" parameterType="Saleenergyinfo" resultType="Integer">
+		<![CDATA[
+			select count(*) from (
+					               select gainercode, group_concat(id) as ids, sum(gainmoney) as gainmoney, sum(energyscore) as energyscore from saleenergyinfo
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			                       group by gainercode
+			                     ) as t
+		 	
+		]]>		
+	</select>
+	
+	<select id="querySaleenergyinfoStat" parameterType="Saleenergyinfo" resultType="Saleenergyinfo">
+		<![CDATA[
+			select gainercode, group_concat(id) as ids, sum(gainmoney) as gainmoney, sum(energyscore) as energyscore from saleenergyinfo
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			group by gainercode
+		 	order by ${sort} ${order}
+		]]>		
+	</select>
+	
+</mapper>

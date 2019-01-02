@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.ICellstationDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">		
+	    <if test="stationcode != null and stationcode != ''">
+			<![CDATA[
+				and stationcode like concat('%',#{stationcode},'%')
+			]]>
+		</if>
+		<if test="extendcode != null and extendcode != ''">
+			<![CDATA[
+				and extendcode like concat('%',#{extendcode},'%')
+			]]>
+		</if>
+	    <if test="cellcode != null and cellcode != ''">
+			<![CDATA[
+				and cellcode like concat('%',#{cellcode},'%')
+			]]>
+		</if>
+		<if test="cellname != null and cellname != ''">
+			<![CDATA[
+				and cellname like concat('%',#{cellname},'%')
+			]]>
+		</if>
+		<if test="address != null and address != ''">
+			<![CDATA[
+				and address like concat('%',#{address},'%')
+			]]>
+		</if>
+		<if test="acceptercode != null and acceptercode != ''">
+			<![CDATA[
+				and acceptercode = #{acceptercode}
+			]]>
+		</if>	
+	</sql>
+	
+	<insert id="save" parameterType="Cellstation">
+		<![CDATA[
+   			insert into cellstation (stationcode,extendcode,cellcode,cellname,address,totalhouse,price,totalmoney,extendercode,extendtime,acceptercode,acceptertime,paytime,starttime,endtime,talkernumber,visitornumber,addtime,remark) 
+   			               values(#{stationcode},#{extendcode},#{cellcode},#{cellname},#{address},#{totalhouse},#{price},#{totalmoney},#{extendercode},#{extendtime},#{acceptercode},#{acceptertime},#{paytime},#{starttime},#{endtime},#{talkernumber},#{visitornumber},#{addtime},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Cellstation">
+		<![CDATA[
+			update cellstation set stationcode=#{stationcode},extendcode=#{extendcode},cellcode=#{cellcode},cellname=#{cellname},address=#{address},totalhouse=#{totalhouse},price=#{price},totalmoney=#{totalmoney},extendercode=#{extendercode},extendtime=#{extendtime},
+							      acceptercode=#{acceptercode},acceptertime=#{acceptertime},paytime=#{paytime},starttime=#{starttime},endtime=#{endtime},talkernumber=#{talkernumber},visitornumber=#{visitornumber},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Cellstation">
+		<![CDATA[
+			delete from cellstation
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Cellstation" resultType="Cellstation">
+		<![CDATA[
+			select * from cellstation
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by id desc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Cellstation" resultType="Integer">
+		<![CDATA[
+			select count(1) from cellstation
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Cellstation" resultType="Cellstation">
+		<![CDATA[
+			select * from cellstation 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by id asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Cellstation" resultType="Cellstation">
+		<![CDATA[
+		 	select * from cellstation
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByStationcode" parameterType="String" resultType="Cellstation">
+		<![CDATA[
+		 	select * from cellstation where stationcode = #{stationcode}
+		]]>
+	</select>
+	
+	<select id="findByExtendcode" parameterType="String" resultType="Cellstation">
+		<![CDATA[
+		 	select * from cellstation where extendcode = #{extendcode}
+		]]>
+	</select>
+	
+</mapper>

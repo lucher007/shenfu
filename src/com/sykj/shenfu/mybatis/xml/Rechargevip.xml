@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sykj.shenfu.dao.IRechargevipDao">
+    <sql id="idColumns">
+   		<![CDATA[
+   			id=#{id}
+   		]]>
+	</sql>
+	
+	<sql id="whereColumns">				
+		<if test="rechargevipname != null and rechargevipname != ''">
+			<![CDATA[
+				and rechargevipname=#{rechargevipname}
+			]]>
+		</if>
+	</sql>
+	
+	<insert id="save" parameterType="Rechargevip">
+		<![CDATA[
+   			insert into rechargevip (rechargevipcode,rechargevipname,rechargemoney,gaintimes,remark) 
+   			               values(#{rechargevipcode},#{rechargevipname},#{rechargemoney},#{gaintimes},#{remark})
+   		]]>
+   		<selectKey resultType="int" keyProperty="id" order="AFTER">
+			<![CDATA[
+				 select LAST_INSERT_ID() 
+			]]>
+		</selectKey>
+	</insert>
+   
+	<update id="update" parameterType="Rechargevip">
+		<![CDATA[
+			update rechargevip set rechargevipcode=#{rechargevipcode},rechargevipname=#{rechargevipname},rechargemoney=#{rechargemoney},
+									gaintimes=#{gaintimes},remark=#{remark}
+		]]>	
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="Rechargevip">
+		<![CDATA[
+			delete from rechargevip
+		]]>		
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</delete>
+	
+	<select id="findByList" parameterType="Rechargevip" resultType="Rechargevip">
+		<![CDATA[
+			select * from rechargevip
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+			order by rechargevipcode asc limit ${page_start},${rows}
+		]]>
+	</select>
+	
+	<select id="findByCount" parameterType="Rechargevip" resultType="Integer">
+		<![CDATA[
+			select count(1) from rechargevip
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			  <include refid="whereColumns"/>
+		</trim>
+	</select>
+	
+	<select id="queryByList" parameterType="Rechargevip" resultType="Rechargevip">
+		<![CDATA[
+			select * from rechargevip 
+		]]>
+		<trim prefix="where" prefixOverrides="and|or">
+			<include refid="whereColumns"/>
+		</trim>
+		<![CDATA[
+		 	order by rechargevipcode asc
+		]]>		
+	</select> 
+	
+	<select id="findById" parameterType="Rechargevip" resultType="Rechargevip">
+		<![CDATA[
+		 	select * from rechargevip
+		]]>
+		<where>
+			<include refid="idColumns"/>
+		</where>
+	</select>
+	
+	<select id="findByRechargevipcode" parameterType="String" resultType="Rechargevip">
+		<![CDATA[
+		 	select * from rechargevip where rechargevipcode = #{rechargevipcode}
+		]]>
+	</select>
+	
+</mapper>
